@@ -1,0 +1,52 @@
+# W-Guard - automatic build from source (Windows runner)
+# Every push builds W-Guard.exe and W-Guard-Setup.exe from this repository.
+# A pushed tag like v1.1 also publishes the files to a GitHub release.
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup -y --no-progress
+
+      - name: Build W-Guard.exe and installer
+        shell: cmd
+        run: build.bat
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: W-Guard
+          path: |
+            W-Guard.exe
+            W-Guard.exe.sha256
+            W-Guard-Setup.exe
+            W-Guard-Setup.exe.sha256
+            build.log
+
+      # Signing with SignPath is added here once the project is approved by SignPath Foundation.
+
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            W-Guard.exe
+            W-Guard.exe.sha256
+            W-Guard-Setup.exe
+            W-Guard-Setup.exe.sha256
