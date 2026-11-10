@@ -16,7 +16,7 @@
   <a href="https://github.com/waelapp">github.com/waelapp</a>
 </p>
 
-<p align="center"><img src="docs/img/overview.jpg" alt="W-Guard" width="900"></p>
+<p align="center"><img src="docs/img/overview.png" alt="W-Guard" width="900"></p>
 
 ---
 
@@ -40,9 +40,9 @@
 ### صور من البرنامج (بيانات تجريبية)
 | | |
 |---|---|
-| <img src="docs/img/scan.jpg" width="420"> | <img src="docs/img/security.jpg" width="420"> |
+| <img src="docs/img/scan.png" width="420"> | <img src="docs/img/security.png" width="420"> |
 | الفحص الشامل مع عدّاد الوقت | الأمان وتقييم الخطورة |
-| <img src="docs/img/background.jpg" width="420"> | <img src="docs/img/desktop-folders.jpg" width="420"> |
+| <img src="docs/img/background.png" width="420"> | <img src="docs/img/desktop-folders.png" width="420"> |
 | الخلفية وبدء التشغيل مع النصائح | ترتيب سطح المكتب بأسماء تختارها |
 
 ### مبادئ الأمان

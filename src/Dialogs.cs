@@ -28,6 +28,26 @@ namespace WGuard
         volatile int current;
         volatile bool finished;
         double shownRemaining = -1, lastTick;
+        double demoElapsed = -1;
+        bool frozen;
+
+        // demo screenshots: show a fixed moment of the scan without running it
+        public void DemoFreeze(int cur, double stepProgress, double elapsed, double remaining, long files, string path)
+        {
+            frozen = true;
+            current = cur;
+            ctx.StepProgress = stepProgress;
+            ctx.Files = files;
+            ctx.Current = path;
+            demoElapsed = elapsed;
+            shownRemaining = remaining;
+            double total = 0, done = 0;
+            for (int i = 0; i < steps.Count; i++) { total += steps[i].Weight; if (i < cur) done += steps[i].Weight; }
+            done += steps[cur].Weight * stepProgress;
+            progress = total > 0 ? done / total : 0;
+        }
+
+        public void ForceClose() { finished = true; Close(); }
         double progress;
 
         public ScanForm(string title, List<ScanStep> list)
@@ -57,6 +77,7 @@ namespace WGuard
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+            if (frozen) return;
             sw.Start();
             timer.Start();
             worker = new Thread(Work) { IsBackground = true };
@@ -139,7 +160,7 @@ namespace WGuard
             Theme.FillRound(g, Theme.TealTint, M(b2), 14);
             Theme.Txt(g, L.T("الوقت المنقضي", "Elapsed"), Theme.Small, Theme.Muted, M(new Rectangle(b1.X + 16, b1.Y + 12, bw - 32, 20)), Theme.Align.Start);
             Theme.Txt(g, L.T("الوقت المتبقي تقريباً", "Time remaining (approx.)"), Theme.Small, Theme.Muted, M(new Rectangle(b2.X + 16, b2.Y + 12, bw - 32, 20)), Theme.Align.Start);
-            DrawClock(g, U.Clock(sw.Elapsed.TotalSeconds), Theme.Text, M(new Rectangle(b1.X + 16, b1.Y + 34, bw - 32, 44)));
+            DrawClock(g, U.Clock(demoElapsed >= 0 ? demoElapsed : sw.Elapsed.TotalSeconds), Theme.Text, M(new Rectangle(b1.X + 16, b1.Y + 34, bw - 32, 44)));
             DrawClock(g, shownRemaining < 0 ? (L.Ar ? "تقدير..." : "estimating...") : U.Clock(shownRemaining), Theme.Primary, M(new Rectangle(b2.X + 16, b2.Y + 34, bw - 32, 44)));
 
             // progress

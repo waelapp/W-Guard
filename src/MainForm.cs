@@ -69,7 +69,7 @@ namespace WGuard
             // quick system read so the overview is filled right away (read-only)
             var th = new Thread(() =>
             {
-                if (Demo.On) { Demo.Load(); try { BeginInvoke((Action)RefreshAll); } catch { } return; }
+                if (Demo.On) { Demo.Load(); try { BeginInvoke((Action)RefreshAll); if (Demo.Shots) BeginInvoke((Action)(() => Demo.TakeShots(this))); } catch { } return; }
                 var info = SysInfo.Collect(null);
                 if (Store.Info == null) Store.Info = info;
                 try { BeginInvoke((Action)RefreshAll); } catch { }
@@ -339,7 +339,8 @@ namespace WGuard
         static void Main(string[] args)
         {
             bool created;
-            using (var mtx = new Mutex(true, "W-Guard.WAEL.SingleInstance", out created))
+            Demo.Detect(args);
+            using (var mtx = new Mutex(true, Demo.Shots ? "W-Guard.WAEL.DemoShots" : "W-Guard.WAEL.SingleInstance", out created))
             {
                 if (!created)
                 {
@@ -353,7 +354,6 @@ namespace WGuard
                 Application.ThreadException += (s, e) => { Log.Write("UI error: " + e.Exception); Msg.Show(null, e.Exception.Message, AppInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Error); };
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Log.Write("fatal: " + e.ExceptionObject);
                 Settings.Load();
-                Demo.Detect(args);
                 L.Ar = Settings.Lang == "ar";
                 Updater.CleanupOld();
                 Log.Write("===== W-Guard " + AppInfo.VersionText + " started (" + Settings.Lang + ")");

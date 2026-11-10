@@ -13,6 +13,7 @@ namespace WGuard
     static class Demo
     {
         public static bool On;
+        public static bool Shots;   // demo.flag = "shots": save lossless PNG screenshots of every page, then quit
 
         public static void Detect(string[] args)
         {
@@ -20,7 +21,9 @@ namespace WGuard
             try
             {
                 string flag = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "demo.flag");
-                if (File.Exists(flag) && File.ReadAllText(flag).Trim().Equals("on", StringComparison.OrdinalIgnoreCase)) On = true;
+                string v = File.Exists(flag) ? File.ReadAllText(flag).Trim().ToLowerInvariant() : "";
+                if (v == "on") On = true;
+                if (v == "shots") { On = true; Shots = true; }
             }
             catch { }
         }
@@ -111,6 +114,54 @@ namespace WGuard
             }
             Store.Add(Scanners.Desktop, desk);
             Store.LastFullScan = DateTime.Now;
+        }
+
+        // renders every page to PNG (lossless, exact pixels) into a "shots" folder next to W-Guard.exe
+        public static void TakeShots(MainForm main)
+        {
+            string dir = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "shots");
+            Directory.CreateDirectory(dir);
+            string[] ids = { "overview", Scanners.Space, Scanners.Old, Scanners.Games, Scanners.Programs, Scanners.Security, Scanners.Background, Scanners.Cleanup, Scanners.Desktop, "about" };
+            foreach (string id in ids)
+            {
+                main.Go(id);
+                main.Refresh();
+                Application.DoEvents();
+                Thread.Sleep(150);
+                Application.DoEvents();
+                Save(main, Path.Combine(dir, (id == Scanners.Old ? "old" : id) + ".png"));
+            }
+            var rows = Store.Get(Scanners.Desktop);
+            using (var f = new OrganizeForm(rows))
+            {
+                f.StartPosition = FormStartPosition.Manual;
+                f.Location = new System.Drawing.Point(40, 40);
+                f.Show(main);
+                Application.DoEvents();
+                Save(f, Path.Combine(dir, "desktop-folders.png"));
+                f.Close();
+            }
+            using (var s = new ScanForm(L.T("جارٍ الفحص الشامل", "Running full scan"), Steps()))
+            {
+                s.DemoFreeze(2, 0.45, 14, 35, 293706, @"D:\SteamLibrary\steamapps\common");
+                s.StartPosition = FormStartPosition.Manual;
+                s.Location = new System.Drawing.Point(40, 40);
+                s.Show(main);
+                Application.DoEvents();
+                Save(s, Path.Combine(dir, "scan.png"));
+                s.ForceClose();
+            }
+            Log.Write("demo screenshots saved: " + dir);
+            Application.Exit();
+        }
+
+        static void Save(System.Windows.Forms.Control c, string file)
+        {
+            using (var bmp = new System.Drawing.Bitmap(c.Width, c.Height))
+            {
+                c.DrawToBitmap(bmp, new System.Drawing.Rectangle(0, 0, c.Width, c.Height));
+                bmp.Save(file, System.Drawing.Imaging.ImageFormat.Png);
+            }
         }
 
         public static List<ScanStep> Steps()
