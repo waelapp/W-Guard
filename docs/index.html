@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W-Guard - فحص وتنظيف وحماية الكمبيوتر</title>
+<meta name="description" content="W-Guard برنامج مجاني ومفتوح المصدر لويندوز يفحص جهازك ويقيّم صحته ويقترح الحلول وينفّذها بعد تأكيدك فقط.">
+<meta property="og:title" content="W-Guard">
+<meta property="og:description" content="فحص وتنظيف وحماية وترتيب الكمبيوتر - مجاني ومفتوح المصدر">
+<meta property="og:image" content="img/overview.jpg">
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#111827; --navy2:#1C2536; --line:#263043; --teal:#00D6A0; --primary:#08876A; --primary-h:#066F57;
+  --tint:#E3F8F1; --bg:#F3F5F8; --card:#fff; --border:#E3E7EE; --text:#111827; --muted:#5B6577; --faint:#8892A4;
+  --warn:#8A4B00; --warnbg:#FFF4E5; --danger:#D9342B; --dangerbg:#FDECEB; --ok:#1F9D6B; --okbg:#E7F6EF;
+  --r:16px; --shadow:0 1px 2px rgba(17,24,39,.04),0 8px 24px rgba(17,24,39,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;font-size:17px;line-height:1.75}
+img{max-width:100%;display:block}
+a{color:var(--primary)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:20;background:rgba(17,24,39,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:22px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:700;font-size:19px}
+.brand img{width:30px;height:30px}
+.links{display:flex;gap:20px;margin-inline-start:auto}
+.links a{color:#C9D1DE;text-decoration:none;font-size:15px}
+.links a:hover{color:#fff}
+.lang{background:transparent;border:1px solid var(--line);color:#fff;border-radius:10px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+.gh{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:var(--navy);text-decoration:none;font-weight:700;font-size:14px;border-radius:10px;padding:8px 14px}
+
+/* hero */
+.hero{background:var(--navy);color:#fff;padding:72px 0 0;overflow:hidden;position:relative}
+.hero:before{content:"";position:absolute;inset:auto -10% 0 -10%;height:46%;background:linear-gradient(180deg,transparent,rgba(0,214,160,.08))}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1fr;gap:40px;text-align:center}
+.pill{display:inline-flex;gap:8px;align-items:center;margin:0 auto;background:var(--navy2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:#C9D1DE}
+.pill b{color:var(--teal);font-weight:600}
+h1{font-size:clamp(34px,5vw,58px);line-height:1.2;margin:18px 0 12px;font-weight:700;letter-spacing:-.5px}
+h1 span{color:var(--teal)}
+.lead{font-size:clamp(17px,2vw,20px);color:#C9D1DE;max-width:760px;margin:0 auto}
+.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:13px 22px;font-weight:700;text-decoration:none;font-size:16px;border:1px solid transparent}
+.btn.primary{background:var(--teal);color:var(--navy)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{border-color:var(--line);color:#fff;background:var(--navy2)}
+.btn small{font-weight:500;opacity:.75}
+.tags{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:20px;color:#8892A4;font-size:14px}
+.tags span:before{content:"✓";color:var(--teal);margin-inline-end:6px}
+.shot{border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.45);background:#fff}
+.hero .shot{margin:8px auto 0;max-width:1040px;border-radius:14px 14px 0 0;border-bottom:0}
+
+/* sections */
+section{padding:84px 0}
+.kicker{color:var(--primary);font-weight:700;font-size:14px;letter-spacing:.4px}
+h2{font-size:clamp(26px,3.4vw,38px);line-height:1.3;margin:6px 0 12px}
+.sub{color:var(--muted);max-width:720px;margin:0}
+.center{text-align:center}.center .sub{margin:0 auto}
+
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:36px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+.ico{width:44px;height:44px;border-radius:12px;background:var(--tint);color:var(--primary);display:grid;place-items:center;margin-bottom:12px}
+.ico svg{width:22px;height:22px}
+.card h3{margin:0 0 6px;font-size:18px}
+.card p{margin:0;color:var(--muted);font-size:15.5px}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px;counter-reset:s}
+.step{position:relative;padding-top:58px}
+.step:before{counter-increment:s;content:counter(s);position:absolute;top:20px;inset-inline-start:22px;width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--teal);font-weight:700;display:grid;place-items:center;font-size:15px}
+
+/* feature rows */
+.feature{display:grid;grid-template-columns:1.25fr 1fr;gap:44px;align-items:center;padding:44px 0;border-top:1px solid var(--border)}
+.feature:first-of-type{border-top:0}
+.feature.flip{grid-template-columns:1fr 1.25fr}
+.feature.flip .media{order:2}
+.feature .shot{border-color:var(--border);box-shadow:var(--shadow)}
+.feature h3{font-size:26px;margin:4px 0 10px}
+.feature .num{color:var(--faint);font-weight:700;font-size:14px}
+.feature ul{list-style:none;padding:0;margin:14px 0 0}
+.feature li{position:relative;padding-inline-start:28px;margin:8px 0;color:#2b3446}
+.feature li:before{content:"";position:absolute;inset-inline-start:0;top:9px;width:16px;height:16px;border-radius:50%;background:var(--tint) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2308876A' stroke-width='3' stroke-linecap='round'><path d='M6 12l4 4 8-8'/></svg>") center/11px no-repeat}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font-size:13.5px;border-radius:999px;padding:3px 12px;font-weight:600}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.warn{background:var(--warnbg);color:var(--warn)}.chip.danger{background:var(--dangerbg);color:var(--danger)}
+.pair{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;align-items:start}
+.small-shot{max-width:420px;margin:0 auto}
+
+/* dark band */
+.band{background:var(--navy);color:#fff}
+.band .sub{color:#C9D1DE}
+.band .card{background:var(--navy2);border-color:var(--line);box-shadow:none}
+.band .card p{color:#AEB7C6}
+.band .ico{background:rgba(0,214,160,.12);color:var(--teal)}
+.band .kicker{color:var(--teal)}
+
+/* download */
+.dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:36px}
+.dl .card{display:flex;flex-direction:column;gap:10px}
+.dl .card.best{border:2px solid var(--primary)}
+.badge{align-self:flex-start;background:var(--tint);color:var(--primary);font-weight:700;font-size:13px;border-radius:999px;padding:2px 10px}
+.dl .btn.primary{background:var(--primary);color:#fff;align-self:flex-start;margin-top:auto}
+.dl .btn.out{border-color:var(--border);color:var(--text);background:#fff;align-self:flex-start;margin-top:auto}
+.note{margin-top:18px;background:var(--warnbg);color:#5b3600;border-radius:14px;padding:16px 18px;font-size:15.5px}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:.92em;background:#EEF1F5;border-radius:6px;padding:1px 6px;direction:ltr;unicode-bidi:embed}
+.req{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:16px;color:var(--muted);font-size:15px}
+
+.vt{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;margin-top:16px;background:var(--okbg);border:1px solid #CBEBDC;border-radius:var(--r);padding:20px 22px}
+.vt-ico{width:48px;height:48px;border-radius:14px;background:#fff;color:var(--ok);display:grid;place-items:center}.vt-ico svg{width:26px;height:26px}
+.vt h3{margin:0 0 4px;font-size:18px}.vt p{margin:0;color:#2f5a46;font-size:15px}
+.vt-links{display:flex;flex-direction:column;gap:8px}.vt .btn.out{border-color:#CBEBDC;color:var(--ok);background:#fff;padding:9px 16px;font-size:14.5px}
+/* faq */
+.faq{max-width:860px;margin:36px auto 0}
+details{background:#fff;border:1px solid var(--border);border-radius:14px;padding:4px 20px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;padding:14px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:var(--primary);font-size:22px;line-height:1}
+details[open] summary:after{content:"–"}
+details p{margin:0 0 16px;color:var(--muted)}
+
+footer{background:var(--navy);color:#8892A4;padding:40px 0;font-size:14.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 30px;align-items:center;justify-content:space-between}
+footer a{color:var(--teal);text-decoration:none}
+footer .brand{font-size:17px}
+
+@media (max-width:900px){
+  .links{display:none}
+  .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps,.dl{grid-template-columns:1fr}
+  .feature,.feature.flip{grid-template-columns:1fr;gap:22px}
+  .feature.flip .media{order:0}
+  .pair{grid-template-columns:1fr}
+  .vt{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .grid4{grid-template-columns:1fr}
+  .nav .gh span{display:none}
+  section{padding:60px 0}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/logo.png" alt="">W-Guard</a>
+    <nav class="links">
+      <a href="#how" data-i="nav_how">كيف يعمل</a>
+      <a href="#features" data-i="nav_features">الأقسام</a>
+      <a href="#safety" data-i="nav_safety">الأمان</a>
+      <a href="#download" data-i="nav_download">التنزيل</a>
+      <a href="#faq" data-i="nav_faq">الأسئلة</a>
+    </nav>
+    <button class="lang" id="lang" type="button">English</button>
+    <a class="gh" href="https://github.com/waelapp/W-Guard"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg><span>GitHub</span></a>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="pill"><b data-i="pill_a">مجاني</b> · <span data-i="pill_b">مفتوح المصدر</span> · <span>Windows 10 / 11</span></div>
+      <h1 data-i="h1">افحص جهازك، نظّفه، واحمِه<br><span>بقرارك أنت</span></h1>
+      <p class="lead" data-i="lead">W-Guard يفحص الكمبيوتر بالكامل ويعطيك تقييماً لصحته، ويكشف ما يأخذ المساحة وما يبطّئ الإقلاع وما يبدو مشبوهاً، ثم يقترح الحل ولا ينفّذ شيئاً إلا بعد أن تختاره وتؤكده.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i="cta_dl">تنزيل W-Guard</span> <small data-i="cta_dl_s">ملف التثبيت</small></a>
+        <a class="btn ghost" href="#features" data-i="cta_tour">جولة في البرنامج</a>
+      </div>
+      <div class="tags"><span data-i="tag1">عربي و English</span><span data-i="tag2">بدون إعلانات أو تتبّع</span><span data-i="tag3">الحذف إلى سلة المحذوفات</span><span data-i="tag4">تحديثات موقّعة بالبصمة</span></div>
+    </div>
+    <div class="shot"><img src="img/overview.jpg" alt="W-Guard overview" width="1301" height="851"></div>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap center">
+    <div class="kicker" data-i="how_k">كيف يعمل</div>
+    <h2 data-i="how_h">ثلاث خطوات، وأنت صاحب القرار في كل خطوة</h2>
+    <p class="sub" data-i="how_s">البرنامج لا يحذف ولا يعطّل شيئاً من تلقاء نفسه. هو يقرأ ويحلّل ويشرح، والتنفيذ يكون بضغطة منك.</p>
+    <div class="steps" style="text-align:start">
+      <div class="card step"><h3 data-i="s1_h">افحص</h3><p data-i="s1_p">اضغط «فحص شامل» ليقرأ البرنامج الأقراص والبرامج والألعاب والتشغيل التلقائي والملفات المؤقتة. عدّادان يوضحان الوقت المنقضي والوقت المتبقي، والفحص للقراءة فقط.</p></div>
+      <div class="card step"><h3 data-i="s2_h">راجع</h3><p data-i="s2_p">تحصل على تقييم لصحة الجهاز من 100 وتنبيهات مرتبة بالأهمية. كل عنصر معه سبب واضح: لماذا يُقترح حذفه أو تعطيله، وكم يوفّر.</p></div>
+      <div class="card step"><h3 data-i="s3_h">نفّذ</h3><p data-i="s3_p">حدد ما تريد، وستظهر نافذة تأكيد بكل العناصر قبل التنفيذ. الحذف إلى سلة المحذوفات افتراضياً، وكل عملية تُسجَّل ويمكن التراجع عنها.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="wrap">
+    <div class="center">
+      <div class="kicker" data-i="f_k">الأقسام</div>
+      <h2 data-i="f_h">كل ما يحتاجه جهازك في مكان واحد</h2>
+      <p class="sub" data-i="f_s">الصور التالية من البرنامج نفسه، ببيانات تجريبية.</p>
+    </div>
+
+    <div class="feature">
+      <div class="media shot"><img src="img/overview.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">01</div>
+        <h3 data-i="f1_h">نظرة عامة</h3>
+        <p class="sub" data-i="f1_p">لوحة واحدة تلخّص حالة جهازك.</p>
+        <ul>
+          <li data-i="f1_1">تقييم صحة الجهاز من 100 بعد الفحص الشامل</li>
+          <li data-i="f1_2">المساحة التي يمكن تحريرها: ملفات مؤقتة، ملفات قديمة، ألعاب لم تُلعب</li>
+          <li data-i="f1_3">حالة Microsoft Defender وآخر تحديث وآخر فحص</li>
+          <li data-i="f1_4">الأقراص ونوعها (NVMe / SSD / HDD) والمساحة الحرة</li>
+          <li data-i="f1_5">تنبيهات ذكية: سرعة الرام أقل من تصنيفها، قرص ممتلئ، برامج خطيرة...</li>
+          <li data-i="f1_6">حفظ تقرير HTML كامل لمشاركته أو الاحتفاظ به</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="media shot small-shot"><img src="img/scan.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">02</div>
+        <h3 data-i="f2_h">الفحص الشامل</h3>
+        <p class="sub" data-i="f2_p">فحص كامل للجهاز مع متابعة لحظية.</p>
+        <ul>
+          <li data-i="f2_1">عدّاد تصاعدي للوقت المنقضي، وعدّاد تنازلي للوقت المتبقي</li>
+          <li data-i="f2_2">نسبة الإنجاز وعدد الملفات والمسار الذي يُفحص الآن</li>
+          <li data-i="f2_3">خطوات واضحة: المواصفات، كل قرص، الألعاب، البرامج، الأمان، الخلفية، المؤقتة</li>
+          <li data-i="f2_4">يمكن إيقافه في أي لحظة</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="media shot"><img src="img/space.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">03</div>
+        <h3 data-i="f3_h">المساحة والملفات القديمة</h3>
+        <p class="sub" data-i="f3_p">اعرف أين ذهبت مساحة أقراصك.</p>
+        <ul>
+          <li data-i="f3_1">أكبر المجلدات والملفات في كل الأقراص</li>
+          <li data-i="f3_2">ملفات لم تُعدَّل منذ مدة تحددها أنت (افتراضياً سنة ونصف)</li>
+          <li data-i="f3_3">ملفات النظام والبرامج للعرض فقط، فلا يمكن حذفها بالخطأ</li>
+          <li data-i="f3_4">الحذف إلى سلة المحذوفات، أو نهائي إن اخترت ذلك صراحةً</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="media shot"><img src="img/games.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">04</div>
+        <h3 data-i="f4_h">الألعاب</h3>
+        <p class="sub" data-i="f4_p">ألعاب Steam و Epic و Xbox في جدول واحد.</p>
+        <ul>
+          <li data-i="f4_1">حجم كل لعبة وتاريخ آخر تشغيل</li>
+          <li data-i="f4_2">تنبيه للألعاب التي لم تُلعب منذ مدة طويلة</li>
+          <li data-i="f4_3">الإزالة تتم عبر المنصة نفسها لتبقى مكتبتك سليمة</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="media shot"><img src="img/programs.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">05</div>
+        <h3 data-i="f5_h">البرامج</h3>
+        <p class="sub" data-i="f5_p">نظّف قائمة البرامج المثبتة.</p>
+        <ul>
+          <li data-i="f5_1">كشف البرامج الدعائية وغير المرغوبة المعروفة</li>
+          <li data-i="f5_2">بقايا برامج أُزيلت وبقي اسمها في القائمة</li>
+          <li data-i="f5_3">البرامج التي لم تُستخدم منذ مدة طويلة</li>
+          <li data-i="f5_4">إزالة عبر أداة الإزالة الرسمية لكل برنامج</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="media shot"><img src="img/security.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">06</div>
+        <h3 data-i="f6_h">الأمان</h3>
+        <p class="sub" data-i="f6_p">كل ما يشتغل تلقائياً في جهازك، مع تقييم للخطورة.</p>
+        <ul>
+          <li data-i="f6_1">مفاتيح التشغيل التلقائي ومجلد بدء التشغيل والمهام المجدولة والخدمات</li>
+          <li data-i="f6_2">كشف السكربتات المخفية وأوامر PowerShell المشفّرة والأسماء المموّهة</li>
+          <li data-i="f6_3">ملفات غير موقّعة رقمياً من مجلدات مؤقتة</li>
+          <li data-i="f6_4">سجل تهديدات Microsoft Defender، وزر فحص سريع</li>
+          <li data-i="f6_5">نسخة احتياطية من أي مدخل في السجل (Registry) قبل حذفه</li>
+        </ul>
+        <div class="legend"><span class="chip danger" data-i="lv3">خطير</span><span class="chip warn" data-i="lv2">مشبوه / بقايا</span><span class="chip ok" data-i="lv1">عولج</span></div>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="media shot"><img src="img/background.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">07</div>
+        <h3 data-i="f7_h">الخلفية وبدء التشغيل</h3>
+        <p class="sub" data-i="f7_p">ماذا يستهلك جهازك الآن، وهل يحتاجه عند الإقلاع؟</p>
+        <ul>
+          <li data-i="f7_1">استهلاك الذاكرة والمعالج لكل برنامج يعمل</li>
+          <li data-i="f7_2">نصيحة لكل عنصر: مهم - اتركه، أو غير ضروري للإقلاع</li>
+          <li data-i="f7_3">تعطيل من بدء التشغيل بنفس طريقة مدير المهام، ويمكن إعادته</li>
+        </ul>
+        <div class="legend"><span class="chip ok" data-i="adv1">مهم - اتركه</span><span class="chip warn" data-i="adv2">غير ضروري للإقلاع</span><span class="chip danger" data-i="adv3">تأكد منه</span></div>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="media shot"><img src="img/cleanup.jpg" alt="" loading="lazy"></div>
+      <div>
+        <div class="num">08</div>
+        <h3 data-i="f8_h">التنظيف</h3>
+        <p class="sub" data-i="f8_p">ملفات يُعاد إنشاؤها تلقائياً، فحذفها آمن.</p>
+        <ul>
+          <li data-i="f8_1">ملفات ويندوز والمستخدم المؤقتة وتقارير الأعطال</li>
+          <li data-i="f8_2">كاش الشيدر لكروت NVIDIA و AMD و DirectX</li>
+          <li data-i="f8_3">تحديثات ويندوز المنزّلة، كاش المتصفحات و Discord و Steam</li>
+          <li data-i="f8_4">سلة المحذوفات والصور المصغّرة</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="media pair">
+        <div class="shot"><img src="img/desktop.jpg" alt="" loading="lazy"></div>
+        <div class="shot"><img src="img/desktop-folders.jpg" alt="" loading="lazy"></div>
+      </div>
+      <div>
+        <div class="num">09</div>
+        <h3 data-i="f9_h">ترتيب سطح المكتب</h3>
+        <p class="sub" data-i="f9_p">سطح مكتب مرتب في ثوانٍ، بأسماء مجلدات تختارها أنت.</p>
+        <ul>
+          <li data-i="f9_1">تصنيف ذكي إلى 8 مجلدات: الألعاب، البرامج، المشاريع، التصاميم، الوسائط، المستندات، المضغوطة، للمراجعة</li>
+          <li data-i="f9_2">يقرأ هدف الاختصار نفسه: اختصار يشير إلى Steam يذهب للألعاب</li>
+          <li data-i="f9_3">قبل البدء تظهر المجلدات وتغيّر أسماءها كما تحب</li>
+          <li data-i="f9_4">كليك يمين لتغيير مجلد أي عنصر، وزر تراجع يعيد كل شيء</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="safety" class="band">
+  <div class="wrap center">
+    <div class="kicker" data-i="sf_k">الأمان والخصوصية</div>
+    <h2 data-i="sf_h">برنامج يلمس ملفاتك يجب أن يكون شفافاً</h2>
+    <p class="sub" data-i="sf_s">لذلك W-Guard مفتوح المصدر بالكامل، ويمكن لأي أحد قراءة كل سطر فيه.</p>
+    <div class="grid4" style="text-align:start">
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div><h3 data-i="sf1_h">الفحص للقراءة فقط</h3><p data-i="sf1_p">لا يُحذف أو يُعطَّل شيء قبل أن تختاره وتؤكد.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div><h3 data-i="sf2_h">سلة المحذوفات أولاً</h3><p data-i="sf2_p">الحذف قابل للاسترجاع افتراضياً، وملفات ويندوز محمية.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i="sf3_h">لا يرسل بياناتك</h3><p data-i="sf3_p">الاتصال الوحيد بالإنترنت هو التحقق من التحديثات على GitHub.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h3 data-i="sf4_h">كل شيء مسجّل</h3><p data-i="sf4_p">سجل لكل عملية، ونسخة احتياطية لمدخلات السجل قبل حذفها.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="updates">
+  <div class="wrap center">
+    <div class="kicker" data-i="up_k">التحديثات</div>
+    <h2 data-i="up_h">تحديثات تلقائية، ومتحقَّق منها</h2>
+    <p class="sub" data-i="up_s">عند كل تشغيل يتحقق W-Guard من صفحة الإصدارات الرسمية. إذا توفر إصدار جديد يظهر لك تنبيه مع قائمة «ما الجديد»، ويُنزَّل التحديث ويُطابَق توقيعه SHA-256 قبل التثبيت، وإلا يُرفض.</p>
+  </div>
+</section>
+
+<section id="download" style="background:#fff;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="center">
+      <div class="kicker" data-i="dl_k">التنزيل</div>
+      <h2 data-i="dl_h">اختر الطريقة التي تناسبك</h2>
+      <p class="sub" data-i="dl_s">نزّل البرنامج من صفحة الإصدارات الرسمية فقط. أي نسخة من مكان آخر ليست رسمية.</p>
+    </div>
+    <div class="dl">
+      <div class="card best">
+        <span class="badge" data-i="dl1_b">الأفضل لأغلب المستخدمين</span>
+        <h3 data-i="dl1_h">ملف التثبيت</h3>
+        <p data-i="dl1_p">يثبّت البرنامج، ويضيف اختصاراً في قائمة ابدأ وسطح المكتب، ويظهر في «التطبيقات المثبتة» ويُزال منها بسهولة. يتحدث بصمت عند صدور إصدار جديد.</p>
+        <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe">W-Guard-Setup.exe</a>
+      </div>
+      <div class="card">
+        <span class="badge" style="background:#EEF1F5;color:var(--muted)" data-i="dl2_b">بدون تثبيت</span>
+        <h3 data-i="dl2_h">النسخة المحمولة</h3>
+        <p data-i="dl2_p">ملف واحد يعمل مباشرة من أي مجلد أو فلاش. مناسب للتجربة السريعة أو لفحص جهاز آخر.</p>
+        <a class="btn out" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard.exe">W-Guard.exe</a>
+      </div>
+    </div>
+    <div class="vt">
+      <div class="vt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div class="vt-txt">
+        <h3 data-i="vt_h">مفحوص على VirusTotal</h3>
+        <p data-i="vt_p">رُفع كل ملف من ملفات الإصدار إلى VirusTotal ليُفحص بأكثر من 70 برنامج حماية. اضغط لترى النتيجة بنفسك. بصمة الملف في الرابط هي نفسها في ملف <code>.sha256</code>.</p>
+      </div>
+      <div class="vt-links">
+        <a class="btn out" href="https://www.virustotal.com/gui/file/11cea43135ba53f3ecbb7c335300832523aeab8b4669530ea859dd4e26313803" target="_blank" rel="noopener"><span data-i="vt_1">نتيجة ملف التثبيت</span></a>
+        <a class="btn out" href="https://www.virustotal.com/gui/file/8335ff20286ea19689f3a015e863947c9a2480287852386cce4a2a54171c2734" target="_blank" rel="noopener"><span data-i="vt_2">نتيجة النسخة المحمولة</span></a>
+      </div>
+    </div>
+    <div class="req"><span data-i="rq1">ويندوز 10 أو 11 (64-bit)</span><span data-i="rq2">.NET Framework 4.8 (موجود في ويندوز)</span><span data-i="rq3">صلاحيات المدير</span><span data-i="rq4">حجم أقل من 3 MB</span></div>
+    <div class="note" data-i="dl_note">قد تظهر رسالة ويندوز الزرقاء «Windows protected your PC» لأن البرنامج جديد وغير موقّع بشهادة تجارية. اضغط «More info» ثم «Run anyway». للتأكد أن الملف أصلي قارن بصمته بملف <code>.sha256</code> الموجود مع الإصدار: <code>Get-FileHash W-Guard-Setup.exe</code></div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="center">
+      <div class="kicker" data-i="fq_k">الأسئلة الشائعة</div>
+      <h2 data-i="fq_h">قبل أن تبدأ</h2>
+    </div>
+    <div class="faq">
+      <details><summary data-i="q1">هل البرنامج مجاني؟</summary><p data-i="a1">نعم، مجاني بالكامل وبدون إعلانات، ومفتوح المصدر بترخيص GPL-3.0.</p></details>
+      <details><summary data-i="q2">هل يحذف شيئاً بدون إذني؟</summary><p data-i="a2">لا. الفحص للقراءة فقط، وأي حذف أو تعطيل يحتاج أن تحدد العناصر بنفسك ثم توافق على نافذة تأكيد تعرضها كلها.</p></details>
+      <details><summary data-i="q3">لماذا يطلب صلاحيات المدير؟</summary><p data-i="a3">ليقرأ سجل ويندوز للبرامج والخدمات وحالة Microsoft Defender، ولينظّف المجلدات المؤقتة الخاصة بالنظام.</p></details>
+      <details><summary data-i="q4">هل يرسل أي بيانات عن جهازي؟</summary><p data-i="a4">لا. الاتصال الوحيد هو قراءة صفحة الإصدارات على GitHub للتحقق من وجود تحديث، ويمكنك إيقافه من الإعدادات.</p></details>
+      <details><summary data-i="q5">رتبت سطح المكتب ولم يعجبني، كيف أرجعه؟</summary><p data-i="a5">من قسم «ترتيب سطح المكتب» اضغط «تراجع عن الترتيب» وسيعود كل عنصر لمكانه وتُحذف المجلدات الفارغة.</p></details>
+      <details><summary data-i="q6">هل يغني عن برنامج الحماية؟</summary><p data-i="a6">لا، W-Guard ليس مضاد فيروسات. هو يعتمد على Microsoft Defender ويكمّله بكشف التشغيل التلقائي المشبوه والبرامج غير المرغوبة.</p></details>
+      <details><summary data-i="q7">كيف أزيله؟</summary><p data-i="a7">من الإعدادات ← التطبيقات المثبتة ← W-Guard ← إلغاء التثبيت. والنسخة المحمولة يكفي حذف الملف.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/logo.png" alt="" width="26" height="26">W-Guard</a>
+    <span>© 2026 WAEL · <span data-i="ft_l">مفتوح المصدر بترخيص</span> <a href="https://github.com/waelapp/W-Guard/blob/main/LICENSE">GPL-3.0</a> · <a href="https://github.com/waelapp">github.com/waelapp</a></span>
+    <span data-i="ft_t">اسم W-Guard والشعار ملك لـ WAEL.</span>
+  </div>
+</footer>
+
+<script>
+const EN = {
+  nav_how:"How it works", nav_features:"Features", nav_safety:"Safety", nav_download:"Download", nav_faq:"FAQ",
+  pill_a:"Free", pill_b:"Open source",
+  h1:"Scan, clean and protect your PC<br><span>on your terms</span>",
+  lead:"W-Guard scans your whole PC and rates its health. It finds what eats your space, what slows down startup and what looks suspicious, then suggests a fix — and changes nothing until you pick it and confirm.",
+  cta_dl:"Download W-Guard", cta_dl_s:"installer", cta_tour:"Take the tour",
+  tag1:"Arabic & English", tag2:"No ads, no tracking", tag3:"Deletes go to the Recycle Bin", tag4:"Hash-verified updates",
+  how_k:"How it works", how_h:"Three steps, and every decision is yours",
+  how_s:"W-Guard never deletes or disables anything on its own. It reads, analyzes and explains — you make the call.",
+  s1_h:"Scan", s1_p:"Press “Full scan” and W-Guard reads your drives, programs, games, autostart entries and temp files. Two timers show elapsed and remaining time. Scanning is read-only.",
+  s2_h:"Review", s2_p:"Get a health score out of 100 and alerts sorted by importance. Every item comes with a clear reason: why it is suggested and how much it frees.",
+  s3_h:"Act", s3_p:"Select what you want and confirm a window that lists every item. Deletes go to the Recycle Bin by default, every action is logged and can be undone.",
+  f_k:"Features", f_h:"Everything your PC needs, in one place", f_s:"Screenshots are from the app itself, with sample data.",
+  f1_h:"Overview", f1_p:"One dashboard that sums up your PC.",
+  f1_1:"Health score out of 100 after a full scan", f1_2:"Space you can free: temp files, old files, games you no longer play",
+  f1_3:"Microsoft Defender status, last update and last scan", f1_4:"Drives, their type (NVMe / SSD / HDD) and free space",
+  f1_5:"Smart alerts: RAM running below its rating, a full drive, risky programs…", f1_6:"Save a full HTML report to share or keep",
+  f2_h:"Full scan", f2_p:"A complete scan you can follow live.",
+  f2_1:"Elapsed time counting up and remaining time counting down", f2_2:"Progress, files scanned and the path being read right now",
+  f2_3:"Clear steps: specs, each drive, games, programs, security, background, temp files", f2_4:"Stop it at any moment",
+  f3_h:"Disk space & old files", f3_p:"See where your storage went.",
+  f3_1:"Largest folders and files on every drive", f3_2:"Files untouched for a period you choose (1.5 years by default)",
+  f3_3:"System and app files are view-only, so they can't be deleted by mistake", f3_4:"Deletes go to the Recycle Bin, or permanently only if you choose so",
+  f4_h:"Games", f4_p:"Steam, Epic and Xbox games in one table.",
+  f4_1:"Size and last played date for every game", f4_2:"Flags games you haven't played for a long time", f4_3:"Uninstall goes through the platform itself so your library stays healthy",
+  f5_h:"Programs", f5_p:"Clean up your installed programs.",
+  f5_1:"Detects known adware and unwanted programs", f5_2:"Leftovers of removed apps still listed", f5_3:"Programs you haven't used for a long time", f5_4:"Removal through each program's official uninstaller",
+  f6_h:"Security", f6_p:"Everything that starts automatically, rated by risk.",
+  f6_1:"Run keys, Startup folder, scheduled tasks and services", f6_2:"Detects hidden scripts, encoded PowerShell and look-alike names",
+  f6_3:"Unsigned executables in temp folders", f6_4:"Microsoft Defender threat history and a quick-scan button", f6_5:"Registry values are backed up before removal",
+  lv3:"Dangerous", lv2:"Suspicious / leftover", lv1:"Handled",
+  f7_h:"Background & startup", f7_p:"What is using your PC right now — and does it need to start with Windows?",
+  f7_1:"Memory and CPU use for every running app", f7_2:"Advice for each item: important — keep it, or not needed at startup", f7_3:"Disable at startup the same way Task Manager does, and re-enable anytime",
+  adv1:"Important — keep", adv2:"Not needed at startup", adv3:"Check it",
+  f8_h:"Cleanup", f8_p:"Files Windows recreates automatically — safe to clear.",
+  f8_1:"Windows and user temp files, crash dumps", f8_2:"Shader caches for NVIDIA, AMD and DirectX", f8_3:"Downloaded Windows updates, browser, Discord and Steam caches", f8_4:"Recycle Bin and thumbnail cache",
+  f9_h:"Desktop organizer", f9_p:"A tidy desktop in seconds, with folder names you choose.",
+  f9_1:"Smart sorting into 8 folders: games, apps, code, designs, media, documents, archives, to review",
+  f9_2:"Reads where a shortcut points: a Steam shortcut goes to Games", f9_3:"Before it starts, review the folders and rename them as you like", f9_4:"Right-click to move any item, and one Undo button restores everything",
+  sf_k:"Safety & privacy", sf_h:"A tool that touches your files should be transparent", sf_s:"That's why W-Guard is fully open source — anyone can read every line.",
+  sf1_h:"Read-only scanning", sf1_p:"Nothing is deleted or disabled until you select and confirm it.",
+  sf2_h:"Recycle Bin first", sf2_p:"Deletes are restorable by default, and Windows files are protected.",
+  sf3_h:"Your data stays yours", sf3_p:"The only network access is the update check on GitHub.",
+  sf4_h:"Everything is logged", sf4_p:"A log for every action, and registry backups before removal.",
+  up_k:"Updates", up_h:"Automatic, verified updates",
+  up_s:"At every start W-Guard checks the official releases page. When a new version is out you get a notice with “What's new”; the update is downloaded and its SHA-256 is verified before installing — otherwise it is rejected.",
+  dl_k:"Download", dl_h:"Pick what suits you", dl_s:"Download only from the official releases page. Copies from anywhere else are not official.",
+  dl1_b:"Best for most people", dl1_h:"Installer", dl1_p:"Installs W-Guard, adds Start menu and desktop shortcuts, shows up in “Installed apps” for easy removal, and updates silently when a new version ships.",
+  dl2_b:"No install", dl2_h:"Portable", dl2_p:"A single file that runs from any folder or USB stick. Great for a quick try or checking another PC.",
+  rq1:"Windows 10 or 11 (64-bit)", rq2:".NET Framework 4.8 (built into Windows)", rq3:"Administrator rights", rq4:"Under 3 MB",
+  dl_note:"Windows may show the blue “Windows protected your PC” message because the app is new and not signed with a commercial certificate. Click “More info” then “Run anyway”. To make sure the file is genuine, compare its hash with the <code>.sha256</code> file in the release: <code>Get-FileHash W-Guard-Setup.exe</code>",
+  fq_k:"FAQ", fq_h:"Before you start",
+  q1:"Is it free?", a1:"Yes — completely free with no ads, and open source under GPL-3.0.",
+  q2:"Does it delete anything without asking?", a2:"No. Scanning is read-only, and any delete or disable requires you to select items and approve a confirmation window that lists them all.",
+  q3:"Why does it need administrator rights?", a3:"To read Windows' records of programs and services and the Microsoft Defender status, and to clean system temp folders.",
+  q4:"Does it send any data about my PC?", a4:"No. The only connection reads the GitHub releases page to check for updates, and you can turn it off in Settings.",
+  q5:"I organized my desktop and don't like it — how do I revert?", a5:"In “Desktop organizer” press “Undo organizing”: every item returns to its place and empty folders are removed.",
+  q6:"Does it replace my antivirus?", a6:"No, W-Guard is not an antivirus. It relies on Microsoft Defender and complements it by spotting suspicious autostarts and unwanted programs.",
+  q7:"How do I uninstall it?", a7:"Settings → Apps → Installed apps → W-Guard → Uninstall. For the portable version just delete the file.",
+  vt_h:"Scanned on VirusTotal", vt_p:"Every release file is uploaded to VirusTotal and checked by 70+ antivirus engines. Click to see the result yourself — the hash in the link matches the <code>.sha256</code> file.", vt_1:"Installer result", vt_2:"Portable result",
+  ft_l:"Open source under", ft_t:"The W-Guard name and logo belong to WAEL."
+};
+const AR = {};
+document.querySelectorAll("[data-i]").forEach(el => AR[el.dataset.i] = el.innerHTML);
+function setLang(l){
+  const d = l === "en" ? EN : AR;
+  document.querySelectorAll("[data-i]").forEach(el => { if (d[el.dataset.i]) el.innerHTML = d[el.dataset.i]; });
+  document.documentElement.lang = l; document.documentElement.dir = l === "en" ? "ltr" : "rtl";
+  document.title = l === "en" ? "W-Guard - Scan, clean and protect your PC" : "W-Guard - فحص وتنظيف وحماية الكمبيوتر";
+  document.getElementById("lang").textContent = l === "en" ? "العربية" : "English";
+  try { localStorage.setItem("wg-lang", l); } catch (e) {}
+}
+document.getElementById("lang").addEventListener("click", () => setLang(document.documentElement.lang === "en" ? "ar" : "en"));
+let saved = null; try { saved = localStorage.getItem("wg-lang"); } catch (e) {}
+if (saved === "en" || (!saved && !(navigator.language || "").startsWith("ar"))) setLang("en");
+</script>
+</body>
+</html>
