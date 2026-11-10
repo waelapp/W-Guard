@@ -416,18 +416,6 @@ namespace WGuard
             try { if (!string.IsNullOrEmpty(s)) return ManagementDateTimeConverter.ToDateTime(s); } catch { }
             return DateTime.MinValue;
         }
-
-        public static string Hash256(string file)
-        {
-            using (var sha = System.Security.Cryptography.SHA256.Create())
-            using (var fs = File.OpenRead(file))
-            {
-                byte[] h = sha.ComputeHash(fs);
-                var sb = new StringBuilder();
-                foreach (byte b in h) sb.Append(b.ToString("x2"));
-                return sb.ToString();
-            }
-        }
     }
 
     // ------------------------------------------------------------------ safety: paths that are never touched

@@ -1,21 +1,21 @@
 # نشر إصدار جديد
 
+## الطريقة التلقائية (المفضلة)
 1. في `src/AssemblyInfo.cs` ارفع الرقم، مثلاً: `AssemblyVersion("1.1.0.0")` و `AssemblyFileVersion("1.1.0.0")` و `AssemblyInformationalVersion("1.1")`.
-2. شغّل `build.bat` - يخرج 4 ملفات: `W-Guard-Setup.exe` و `W-Guard-Setup.exe.sha256` (ملف التثبيت) و `W-Guard.exe` و `W-Guard.exe.sha256` (النسخة المحمولة).
-   ملف التثبيت يحتاج [Inno Setup 6](https://jrsoftware.org/isdl.php) مثبتاً على جهازك.
-3. ارفع تعديلات الكود إلى GitHub.
-4. في المستودع: **Releases ← Draft a new release**
-   - Tag: `v1.1`
-   - Title: `W-Guard 1.1`
-   - الوصف: ما الجديد (يظهر للمستخدمين داخل نافذة التحديث)
-   - ارفع الملفات الأربعة
-5. اضغط **Publish release**.
+2. ارفع التعديلات إلى GitHub.
+3. أنشئ Tag جديداً مثل `v1.1` (من صفحة Releases ← Draft a new release ← اكتب الـ Tag واختر Create new tag ← Publish).
+4. GitHub Actions يبني البرنامج وملف التثبيت من الكود ويرفق الملفات الأربعة بالإصدار تلقائياً.
 
-كل نسخة مثبّتة تتحقق عند التشغيل وتظهر لها نافذة "يتوفر إصدار جديد".
-النسخ المثبّتة تتحدث عبر `W-Guard-Setup.exe` بصمت، والنسخة المحمولة تستبدل نفسها بـ `W-Guard.exe`.
-لا تحذف ملفات `.sha256` - بدونها يرفض البرنامج التحديث.
+## الطريقة اليدوية
+1. شغّل `build.bat` - يخرج: `W-Guard-Setup.exe` و `W-Guard-Setup.exe.sha256` و `W-Guard.exe` و `W-Guard.exe.sha256`.
+2. في GitHub: **Releases ← Draft a new release**، الـ Tag مثل `v1.1`، واكتب «ما الجديد» (يظهر للمستخدمين داخل نافذة التحديث).
+3. اسحب الملفات الأربعة إلى المربع المنقّط السفلي «Attach binaries» (وليس مربع الوصف) ثم **Publish release**.
+
+## كيف يصل التحديث للمستخدمين
+كل نسخة تتحقق عند التشغيل، فتظهر نافذة «يتوفر إصدار جديد» بخطوتين:
+1. «تنزيل التحديث» يفتح رابط الملف في المتصفح (ملف التثبيت للنسخة المثبتة، و `W-Guard.exe` للمحمولة).
+2. المستخدم يشغّل الملف المنزّل فيثبّت الإصدار الجديد.
 
 ## بعد النشر: VirusTotal
 1. ارفع `W-Guard-Setup.exe` و `W-Guard.exe` على https://www.virustotal.com
-2. البصمة الجديدة موجودة في ملفات `.sha256`. حدّث الرابطين في `docs/index.html` و `README.md`:
-   `https://www.virustotal.com/gui/file/<البصمة>`
+2. حدّث رابطي النتيجة في `docs/index.html` (سؤال «هل البرنامج آمن؟») و `README.md` بالبصمة الجديدة من ملفات `.sha256`.

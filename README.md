@@ -50,12 +50,7 @@
 - الحذف إلى **سلة المحذوفات** افتراضياً، وملفات ويندوز والمجلدات الحساسة محمية.
 - كل عملية تُسجَّل، ومدخلات السجل (Registry) تُنسخ احتياطياً قبل حذفها.
 - الاتصال الوحيد بالإنترنت هو التحقق من التحديثات من هذه الصفحة، ولا يُرسل أي بيانات عن جهازك.
-- التحديث لا يُقبل إلا إذا طابقت بصمته **SHA-256** الملف المنشور مع الإصدار.
-
-### مفحوص على VirusTotal
-كل ملفات الإصدار مرفوعة على VirusTotal ومفحوصة بأكثر من 70 برنامج حماية:
-- [نتيجة ملف التثبيت W-Guard-Setup.exe](https://www.virustotal.com/gui/file/11cea43135ba53f3ecbb7c335300832523aeab8b4669530ea859dd4e26313803)
-- [نتيجة النسخة المحمولة W-Guard.exe](https://www.virustotal.com/gui/file/8335ff20286ea19689f3a015e863947c9a2480287852386cce4a2a54171c2734)
+- البرنامج **لا ينزّل ولا يشغّل أي ملف بنفسه**: عند صدور إصدار جديد يظهر تنبيه، والتنزيل يتم من متصفحك بضغطة منك.
 
 ### التنزيل
 من صفحة [Releases](https://github.com/waelapp/W-Guard/releases/latest) فقط. أي نسخة من مكان آخر ليست رسمية.
@@ -67,7 +62,7 @@
 ```
 build.bat
 ```
-يخرج `W-Guard.exe`، وإذا كان [Inno Setup 6](https://jrsoftware.org/isdl.php) مثبتاً يخرج أيضاً `W-Guard-Setup.exe`.
+يخرج `W-Guard.exe`، وإذا كان [Inno Setup](https://jrsoftware.org/isdl.php) مثبتاً يخرج أيضاً `W-Guard-Setup.exe`. نفس الخطوات تعمل تلقائياً في GitHub Actions مع كل تحديث للكود.
 
 ---
 
@@ -79,14 +74,29 @@ build.bat
 - Deletes go to the Recycle Bin by default; Windows and sensitive folders are protected.
 - Every action is logged; registry values are backed up before removal.
 - The only network access is the update check against this repository; no data about your PC is sent.
-- Updates are accepted only when their SHA-256 matches the hash published with the release.
+- W-Guard never downloads or runs files itself: when a new version is out it shows a notice and you download it in your browser.
 - Arabic and English interface.
-
-**VirusTotal:** [installer](https://www.virustotal.com/gui/file/11cea43135ba53f3ecbb7c335300832523aeab8b4669530ea859dd4e26313803) · [portable](https://www.virustotal.com/gui/file/8335ff20286ea19689f3a015e863947c9a2480287852386cce4a2a54171c2734)
 
 **Build:** run `build.bat` (needs only .NET Framework 4.8, built into Windows).
 
 ---
+
+## الأمان والتنبيهات / Antivirus results
+Microsoft Defender و Kaspersky و BitDefender لا تعطي أي تنبيه. بعض الفاحصات التي تعتمد على الذكاء الاصطناعي قد تشك في أي برنامج جديد غير موقّع يطلب صلاحيات المدير - إنذار خاطئ نعمل على إزالته بالتوقيع الرقمي. النتيجة كاملة: [ملف التثبيت](https://www.virustotal.com/gui/file/b0f518b472f5fda6b5182c79a457f76f56a3912d753d73df012aaa8bb7eab8cf) · [النسخة المحمولة](https://www.virustotal.com/gui/file/e4d013de24c0d06b329bfe64df3fa0bad4db971cc205f9146422605d9088f32e)
+
+## سياسة توقيع الكود / Code signing policy
+يُبنى البرنامج تلقائياً من هذا المستودع عبر [GitHub Actions](.github/workflows/build.yml)، ولا يُوقَّع إلا ما بُني من الكود المنشور.
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org) *(application in review)*.
+
+- Committers and reviewers: [WAEL (waelapp)](https://github.com/waelapp)
+- Approvers: [WAEL (waelapp)](https://github.com/waelapp)
+
+التفاصيل في [CODE_SIGNING.md](CODE_SIGNING.md).
+
+## الخصوصية / Privacy policy
+W-Guard لا يرسل أي معلومات عن جهازك. الاتصال الوحيد هو طلب واحد عند التشغيل إلى `api.github.com` لمعرفة رقم آخر إصدار، ويمكن إيقافه من الإعدادات.
+
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. The only exception is a version check against `api.github.com` at start-up, which can be turned off in Settings.
 
 ## الترخيص / License
 الكود مرخّص بـ **GNU GPL v3.0**: يحق لأي شخص استخدامه وتعديله، بشرط أن تبقى أي نسخة معدّلة منشورة مفتوحة المصدر بنفس الترخيص مع الإبقاء على حقوق المؤلف.

@@ -116,6 +116,8 @@ code{font-family:Consolas,"Cascadia Mono",monospace;font-size:.92em;background:#
 .vt-ico{width:48px;height:48px;border-radius:14px;background:#fff;color:var(--ok);display:grid;place-items:center}.vt-ico svg{width:26px;height:26px}
 .vt h3{margin:0 0 4px;font-size:18px}.vt p{margin:0;color:#2f5a46;font-size:15px}
 .vt-links{display:flex;flex-direction:column;gap:8px}.vt .btn.out{border-color:#CBEBDC;color:var(--ok);background:#fff;padding:9px 16px;font-size:14.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:36px}.grid2 h3{margin:0 0 8px;font-size:19px}.grid2 p{color:var(--muted);margin:0 0 8px;font-size:15.5px}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
 /* faq */
 .faq{max-width:860px;margin:36px auto 0}
 details{background:#fff;border:1px solid var(--border);border-radius:14px;padding:4px 20px;margin:10px 0}
@@ -174,7 +176,7 @@ footer .brand{font-size:17px}
         <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i="cta_dl">تنزيل W-Guard</span> <small data-i="cta_dl_s">ملف التثبيت</small></a>
         <a class="btn ghost" href="#features" data-i="cta_tour">جولة في البرنامج</a>
       </div>
-      <div class="tags"><span data-i="tag1">عربي و English</span><span data-i="tag2">بدون إعلانات أو تتبّع</span><span data-i="tag3">الحذف إلى سلة المحذوفات</span><span data-i="tag4">تحديثات موقّعة بالبصمة</span></div>
+      <div class="tags"><span data-i="tag1">عربي و English</span><span data-i="tag2">بدون إعلانات أو تتبّع</span><span data-i="tag3">الحذف إلى سلة المحذوفات</span><span data-i="tag4">مفتوح المصدر بالكامل</span></div>
     </div>
     <div class="shot"><img src="img/overview.jpg" alt="W-Guard overview" width="1301" height="851"></div>
   </div>
@@ -361,8 +363,8 @@ footer .brand{font-size:17px}
 <section id="updates">
   <div class="wrap center">
     <div class="kicker" data-i="up_k">التحديثات</div>
-    <h2 data-i="up_h">تحديثات تلقائية، ومتحقَّق منها</h2>
-    <p class="sub" data-i="up_s">عند كل تشغيل يتحقق W-Guard من صفحة الإصدارات الرسمية. إذا توفر إصدار جديد يظهر لك تنبيه مع قائمة «ما الجديد»، ويُنزَّل التحديث ويُطابَق توقيعه SHA-256 قبل التثبيت، وإلا يُرفض.</p>
+    <h2 data-i="up_h">تنبيه فوري بكل إصدار جديد</h2>
+    <p class="sub" data-i="up_s">عند كل تشغيل يتحقق W-Guard من صفحة الإصدارات الرسمية. إذا توفر إصدار جديد يظهر لك تنبيه مع قائمة «ما الجديد»، والتحديث خطوتان: اضغط «تنزيل التحديث» فيُنزَّل من GitHub في متصفحك، ثم شغّل الملف فيثبّت الإصدار الجديد مع إبقاء إعداداتك. البرنامج نفسه لا ينزّل ولا يشغّل أي ملف.</p>
   </div>
 </section>
 
@@ -377,7 +379,7 @@ footer .brand{font-size:17px}
       <div class="card best">
         <span class="badge" data-i="dl1_b">الأفضل لأغلب المستخدمين</span>
         <h3 data-i="dl1_h">ملف التثبيت</h3>
-        <p data-i="dl1_p">يثبّت البرنامج، ويضيف اختصاراً في قائمة ابدأ وسطح المكتب، ويظهر في «التطبيقات المثبتة» ويُزال منها بسهولة. يتحدث بصمت عند صدور إصدار جديد.</p>
+        <p data-i="dl1_p">يثبّت البرنامج، ويضيف اختصاراً في قائمة ابدأ وسطح المكتب، ويظهر في «التطبيقات المثبتة» ويُزال منها بسهولة. ينبّهك عند صدور إصدار جديد.</p>
         <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe">W-Guard-Setup.exe</a>
       </div>
       <div class="card">
@@ -385,17 +387,6 @@ footer .brand{font-size:17px}
         <h3 data-i="dl2_h">النسخة المحمولة</h3>
         <p data-i="dl2_p">ملف واحد يعمل مباشرة من أي مجلد أو فلاش. مناسب للتجربة السريعة أو لفحص جهاز آخر.</p>
         <a class="btn out" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard.exe">W-Guard.exe</a>
-      </div>
-    </div>
-    <div class="vt">
-      <div class="vt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
-      <div class="vt-txt">
-        <h3 data-i="vt_h">مفحوص على VirusTotal</h3>
-        <p data-i="vt_p">رُفع كل ملف من ملفات الإصدار إلى VirusTotal ليُفحص بأكثر من 70 برنامج حماية. اضغط لترى النتيجة بنفسك. بصمة الملف في الرابط هي نفسها في ملف <code>.sha256</code>.</p>
-      </div>
-      <div class="vt-links">
-        <a class="btn out" href="https://www.virustotal.com/gui/file/11cea43135ba53f3ecbb7c335300832523aeab8b4669530ea859dd4e26313803" target="_blank" rel="noopener"><span data-i="vt_1">نتيجة ملف التثبيت</span></a>
-        <a class="btn out" href="https://www.virustotal.com/gui/file/8335ff20286ea19689f3a015e863947c9a2480287852386cce4a2a54171c2734" target="_blank" rel="noopener"><span data-i="vt_2">نتيجة النسخة المحمولة</span></a>
       </div>
     </div>
     <div class="req"><span data-i="rq1">ويندوز 10 أو 11 (64-bit)</span><span data-i="rq2">.NET Framework 4.8 (موجود في ويندوز)</span><span data-i="rq3">صلاحيات المدير</span><span data-i="rq4">حجم أقل من 3 MB</span></div>
@@ -416,7 +407,24 @@ footer .brand{font-size:17px}
       <details><summary data-i="q4">هل يرسل أي بيانات عن جهازي؟</summary><p data-i="a4">لا. الاتصال الوحيد هو قراءة صفحة الإصدارات على GitHub للتحقق من وجود تحديث، ويمكنك إيقافه من الإعدادات.</p></details>
       <details><summary data-i="q5">رتبت سطح المكتب ولم يعجبني، كيف أرجعه؟</summary><p data-i="a5">من قسم «ترتيب سطح المكتب» اضغط «تراجع عن الترتيب» وسيعود كل عنصر لمكانه وتُحذف المجلدات الفارغة.</p></details>
       <details><summary data-i="q6">هل يغني عن برنامج الحماية؟</summary><p data-i="a6">لا، W-Guard ليس مضاد فيروسات. هو يعتمد على Microsoft Defender ويكمّله بكشف التشغيل التلقائي المشبوه والبرامج غير المرغوبة.</p></details>
+      <details><summary data-i="q8">هل البرنامج آمن؟ وماذا عن تنبيهات بعض برامج الحماية؟</summary><p data-i="a8">الكود مفتوح بالكامل ويمكن لأي أحد مراجعته. Microsoft Defender و Kaspersky و BitDefender وغيرها لا تعطي أي تنبيه. بعض الفاحصات التي تعتمد على الذكاء الاصطناعي قد تشك في أي برنامج جديد غير موقّع رقمياً يطلب صلاحيات المدير، وهذا إنذار خاطئ نعمل على إزالته بالتوقيع الرقمي. يمكنك رؤية نتيجة الفحص بنفسك: <a href="https://www.virustotal.com/gui/file/b0f518b472f5fda6b5182c79a457f76f56a3912d753d73df012aaa8bb7eab8cf" target="_blank" rel="noopener">ملف التثبيت</a> · <a href="https://www.virustotal.com/gui/file/e4d013de24c0d06b329bfe64df3fa0bad4db971cc205f9146422605d9088f32e" target="_blank" rel="noopener">النسخة المحمولة</a></p></details>
       <details><summary data-i="q7">كيف أزيله؟</summary><p data-i="a7">من الإعدادات ← التطبيقات المثبتة ← W-Guard ← إلغاء التثبيت. والنسخة المحمولة يكفي حذف الملف.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="policy" style="background:#fff;border-top:1px solid var(--border);padding:56px 0">
+  <div class="wrap">
+    <div class="grid2">
+      <div>
+        <h3 data-i="cs_h">سياسة توقيع الكود (Code signing policy)</h3>
+        <p data-i="cs_p">يُبنى W-Guard تلقائياً من هذا المستودع عبر GitHub Actions، ولا يُوقَّع إلا ما بُني من الكود المنشور. Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a> (قيد المراجعة).</p>
+        <p data-i="cs_r"><b>الأدوار:</b> المؤلف والمراجع والمعتمد لكل إصدار: <a href="https://github.com/waelapp">WAEL (waelapp)</a>.</p>
+      </div>
+      <div>
+        <h3 data-i="pv_h">سياسة الخصوصية</h3>
+        <p data-i="pv_p">W-Guard لا يرسل أي معلومات عن جهازك. الاتصال الوحيد هو طلب واحد عند التشغيل إلى api.github.com لمعرفة رقم آخر إصدار، ويمكنك إيقافه من الإعدادات. لا يُنقل أي شيء آخر إلا إذا طلبته أنت صراحةً.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -425,6 +433,7 @@ footer .brand{font-size:17px}
   <div class="wrap">
     <a class="brand" href="#top"><img src="img/logo.png" alt="" width="26" height="26">W-Guard</a>
     <span>© 2026 WAEL · <span data-i="ft_l">مفتوح المصدر بترخيص</span> <a href="https://github.com/waelapp/W-Guard/blob/main/LICENSE">GPL-3.0</a> · <a href="https://github.com/waelapp">github.com/waelapp</a></span>
+    <a href="#policy" data-i="ft_cs">سياسة توقيع الكود والخصوصية</a>
     <span data-i="ft_t">اسم W-Guard والشعار ملك لـ WAEL.</span>
   </div>
 </footer>
@@ -436,7 +445,7 @@ const EN = {
   h1:"Scan, clean and protect your PC<br><span>on your terms</span>",
   lead:"W-Guard scans your whole PC and rates its health. It finds what eats your space, what slows down startup and what looks suspicious, then suggests a fix — and changes nothing until you pick it and confirm.",
   cta_dl:"Download W-Guard", cta_dl_s:"installer", cta_tour:"Take the tour",
-  tag1:"Arabic & English", tag2:"No ads, no tracking", tag3:"Deletes go to the Recycle Bin", tag4:"Hash-verified updates",
+  tag1:"Arabic & English", tag2:"No ads, no tracking", tag3:"Deletes go to the Recycle Bin", tag4:"Fully open source",
   how_k:"How it works", how_h:"Three steps, and every decision is yours",
   how_s:"W-Guard never deletes or disables anything on its own. It reads, analyzes and explains — you make the call.",
   s1_h:"Scan", s1_p:"Press “Full scan” and W-Guard reads your drives, programs, games, autostart entries and temp files. Two timers show elapsed and remaining time. Scanning is read-only.",
@@ -474,10 +483,10 @@ const EN = {
   sf2_h:"Recycle Bin first", sf2_p:"Deletes are restorable by default, and Windows files are protected.",
   sf3_h:"Your data stays yours", sf3_p:"The only network access is the update check on GitHub.",
   sf4_h:"Everything is logged", sf4_p:"A log for every action, and registry backups before removal.",
-  up_k:"Updates", up_h:"Automatic, verified updates",
-  up_s:"At every start W-Guard checks the official releases page. When a new version is out you get a notice with “What's new”; the update is downloaded and its SHA-256 is verified before installing — otherwise it is rejected.",
+  up_k:"Updates", up_h:"Instant notice of every new version",
+  up_s:"At every start W-Guard checks the official releases page. When a new version is out you get a notice with “What's new”, and updating is two steps: press “Download update” and your browser downloads it from GitHub, then run it to install the new version with your settings kept. W-Guard itself never downloads or runs any file.",
   dl_k:"Download", dl_h:"Pick what suits you", dl_s:"Download only from the official releases page. Copies from anywhere else are not official.",
-  dl1_b:"Best for most people", dl1_h:"Installer", dl1_p:"Installs W-Guard, adds Start menu and desktop shortcuts, shows up in “Installed apps” for easy removal, and updates silently when a new version ships.",
+  dl1_b:"Best for most people", dl1_h:"Installer", dl1_p:"Installs W-Guard, adds Start menu and desktop shortcuts, shows up in “Installed apps” for easy removal, and lets you know when a new version ships.",
   dl2_b:"No install", dl2_h:"Portable", dl2_p:"A single file that runs from any folder or USB stick. Great for a quick try or checking another PC.",
   rq1:"Windows 10 or 11 (64-bit)", rq2:".NET Framework 4.8 (built into Windows)", rq3:"Administrator rights", rq4:"Under 3 MB",
   dl_note:"Windows may show the blue “Windows protected your PC” message because the app is new and not signed with a commercial certificate. Click “More info” then “Run anyway”. To make sure the file is genuine, compare its hash with the <code>.sha256</code> file in the release: <code>Get-FileHash W-Guard-Setup.exe</code>",
@@ -490,6 +499,11 @@ const EN = {
   q6:"Does it replace my antivirus?", a6:"No, W-Guard is not an antivirus. It relies on Microsoft Defender and complements it by spotting suspicious autostarts and unwanted programs.",
   q7:"How do I uninstall it?", a7:"Settings → Apps → Installed apps → W-Guard → Uninstall. For the portable version just delete the file.",
   vt_h:"Scanned on VirusTotal", vt_p:"Every release file is uploaded to VirusTotal and checked by 70+ antivirus engines. Click to see the result yourself — the hash in the link matches the <code>.sha256</code> file.", vt_1:"Installer result", vt_2:"Portable result",
+  q8:"Is it safe? What about warnings from some antivirus engines?", a8:"The code is fully open for anyone to review. Microsoft Defender, Kaspersky, BitDefender and others raise no warning. A few AI-based scanners may distrust any new, unsigned program that asks for admin rights — a false positive we are removing with code signing. See the scan yourself: <a href=\"https://www.virustotal.com/gui/file/b0f518b472f5fda6b5182c79a457f76f56a3912d753d73df012aaa8bb7eab8cf\" target=\"_blank\" rel=\"noopener\">installer</a> · <a href=\"https://www.virustotal.com/gui/file/e4d013de24c0d06b329bfe64df3fa0bad4db971cc205f9146422605d9088f32e\" target=\"_blank\" rel=\"noopener\">portable</a>",
+  cs_h:"Code signing policy", cs_p:"W-Guard is built automatically from this repository with GitHub Actions, and only binaries built from the published source are signed. Free code signing provided by <a href=\"https://signpath.io\">SignPath.io</a>, certificate by <a href=\"https://signpath.org\">SignPath Foundation</a> (in review).",
+  cs_r:"<b>Roles:</b> author, reviewer and approver of every release: <a href=\"https://github.com/waelapp\">WAEL (waelapp)</a>.",
+  pv_h:"Privacy policy", pv_p:"W-Guard sends no information about your PC. Its only connection is one request at start to api.github.com to read the latest version number, which you can turn off in Settings. Nothing else is transferred unless you explicitly ask for it.",
+  ft_cs:"Code signing & privacy policy",
   ft_l:"Open source under", ft_t:"The W-Guard name and logo belong to WAEL."
 };
 const AR = {};
