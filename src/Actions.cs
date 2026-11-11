@@ -177,8 +177,20 @@ namespace WGuard
                 cmd = System.Text.RegularExpressions.Regex.Replace(cmd, @"(?i)/I\s*\{", "/X{");
             Log.Write("uninstall: " + r.Name + " | " + cmd);
             DateTime started = DateTime.Now;
-            var psi = new ProcessStartInfo("cmd.exe", "/c \"" + cmd + "\"") { UseShellExecute = false, CreateNoWindow = true };
-            using (var p = Process.Start(psi)) { p.WaitForExit(); }
+            // start the uninstaller the way Windows "Installed apps" does, so its window opens in front
+            string exe, args;
+            SplitCommand(cmd, out exe, out args);
+            Native.AllowSetForegroundWindow(-1);
+            Process p0 = null;
+            try
+            {
+                if (exe != null && File.Exists(exe))
+                    p0 = Process.Start(new ProcessStartInfo(exe, args) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(exe) });
+                else
+                    p0 = Process.Start(new ProcessStartInfo("cmd.exe", "/s /c \"" + cmd + "\"") { UseShellExecute = false, CreateNoWindow = true });
+                if (p0 != null) p0.WaitForExit();
+            }
+            finally { if (p0 != null) p0.Dispose(); }
             // many uninstallers (Inno Setup, NSIS) hand over to a copy of themselves and return at once,
             // so wait while one is still running, then check that the program really left the list
             DateTime limit = DateTime.Now.AddMinutes(15), grace = DateTime.Now.AddSeconds(20);
@@ -187,6 +199,27 @@ namespace WGuard
                 throw new Exception(L.T("لم تكتمل الإزالة - رُبما أُلغيت أو فشلت أداة الإزالة. أعد المحاولة وأكمل خطواتها حتى النهاية.",
                     "Removal was not completed - the uninstaller was cancelled or failed. Try again and follow it to the end."));
             return L.T("أُزيل", "Removed");
+        }
+
+        // "C:\Program Files\App\unins000.exe" /x  ->  exe + arguments (quoted or not)
+        static void SplitCommand(string cmd, out string exe, out string args)
+        {
+            exe = null; args = "";
+            cmd = Environment.ExpandEnvironmentVariables(cmd.Trim());
+            if (cmd.StartsWith("\""))
+            {
+                int q = cmd.IndexOf('"', 1);
+                if (q > 0) { exe = cmd.Substring(1, q - 1); args = cmd.Substring(q + 1).Trim(); }
+                return;
+            }
+            int i = cmd.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+            if (i > 0) { exe = cmd.Substring(0, i + 4); args = cmd.Substring(i + 4).Trim(); }
+            if (exe != null && !exe.Contains("\\"))
+            {
+                // MsiExec.exe and other system tools
+                string sys = Path.Combine(Environment.SystemDirectory, exe);
+                if (File.Exists(sys)) exe = sys;
+            }
         }
 
         static bool StillInstalled(Row r)
