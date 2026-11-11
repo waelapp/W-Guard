@@ -498,10 +498,9 @@ namespace WGuard
                         else
                         {
                             // something failed: show what and where to find the full log
-                            string msg = (ok > 0 ? L.T("نجح: ", "Succeeded: ") + ok + "   ·   " : "") + L.T("لم ينجح: ", "Failed: ") + fail + "\n\n" + string.Join("\n", errors.Take(6).ToArray());
-                            if (errors.Count > 6) msg += "\n...";
-                            msg += "\n\n" + L.T("السجل الكامل: ", "Full log: ") + Log.FilePath;
-                            Msg.Show(this, msg, L.T("لم تكتمل بعض العمليات", "Some actions did not finish"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            string msg = (ok > 0 ? L.T("نجح: ", "Succeeded: ") + ok + "   ·   " : "") + L.T("لم ينجح: ", "Failed: ") + fail;
+                            string det = string.Join("\n\n", errors.Take(10).ToArray()) + (errors.Count > 10 ? "\n..." : "");
+                            Msg.Problem(this, msg, L.T("لم تكتمل بعض العمليات", "Some actions did not finish"), det);
                         }
                     }));
                 }
