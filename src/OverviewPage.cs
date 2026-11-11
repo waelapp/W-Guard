@@ -204,8 +204,8 @@ namespace WGuard
                     {
                         Theme.FillRound(g, Theme.WarnBg, M(ob), 12);
                         TextRenderer.DrawText(g, Glyph.Search, Theme.Icon, M(new Rectangle(ob.X + 16, ob.Y, 24, ob.Height)), Theme.Warn, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
-                        int d = Store.DaysSinceFull;
-                        Theme.Txt(g, L.T("مرّ " + d + " " + (d <= 10 ? "أيام" : "يوماً") + " على آخر فحص شامل - ننصح بفحص جديد لتحديث النتائج", d + " days since the last full scan - a new scan is recommended to refresh the results"),
+                        int ds = Store.DaysSinceFull;
+                        Theme.Txt(g, L.T("مرّ " + ds + " " + (ds <= 10 ? "أيام" : "يوماً") + " على آخر فحص شامل - ننصح بفحص جديد لتحديث النتائج", ds + " days since the last full scan - a new scan is recommended to refresh the results"),
                             Theme.Bold, Theme.Warn, M(new Rectangle(ob.X + 48, ob.Y, ob.Width - 230, ob.Height)), Theme.Align.Start, true, true);
                         var bb = M(new Rectangle(ob.Right - 170, ob.Y + 13, 156, 38));
                         Theme.FillRound(g, Theme.Primary, bb, 10);
