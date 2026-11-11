@@ -39,14 +39,23 @@ jobs:
             W-Guard-Setup.exe.sha256
             build.log
 
-      # Signing with SignPath is added here once the project is approved by SignPath Foundation.
+      - name: Add the version to the file names (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart('v')
+          foreach ($p in @(@('W-Guard.exe', "W-Guard-$v.exe"), @('W-Guard-Setup.exe', "W-Guard-Setup-$v.exe"))) {
+            Copy-Item $p[0] $p[1]
+            $h = (Get-FileHash $p[1] -Algorithm SHA256).Hash.ToLower()
+            "$h  $($p[1])" | Out-File -Encoding ascii "$($p[1]).sha256"
+          }
 
       - name: Publish release (tags only)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            W-Guard.exe
-            W-Guard.exe.sha256
-            W-Guard-Setup.exe
-            W-Guard-Setup.exe.sha256
+            W-Guard-[0-9]*.exe
+            W-Guard-[0-9]*.exe.sha256
+            W-Guard-Setup-[0-9]*.exe
+            W-Guard-Setup-[0-9]*.exe.sha256
