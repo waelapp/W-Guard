@@ -58,14 +58,14 @@ namespace WGuard
             }
 
             // ---- table card
-            card = new Panel { Dock = DockStyle.Fill, BackColor = Color.White, Padding = new Padding(1) };
+            card = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Card, Padding = new Padding(1) };
             card.Paint += (s, e) => { using (var p = new Pen(Theme.Border)) e.Graphics.DrawRectangle(p, 0, 0, card.Width - 1, card.Height - 1); };
             grid = new DataGridView();
             StyleGrid(grid);
             card.Controls.Add(grid);
             empty = new Label
             {
-                Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = Theme.H2, ForeColor = Theme.Muted, BackColor = Color.White,
+                Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = Theme.H2, ForeColor = Theme.Muted, BackColor = Theme.Card,
                 Text = L.T("لم يُفحص هذا القسم بعد.\nاضغط \"فحص\" في الأعلى - الفحص للقراءة فقط ولن يُغيّر شيئاً.", "This section has not been scanned yet.\nPress \"Scan\" above - scanning is read-only and changes nothing.")
             };
             card.Controls.Add(empty);
@@ -73,9 +73,9 @@ namespace WGuard
 
             // ---- bottom action bar
             var bar = new Panel { Dock = DockStyle.Bottom, Height = 66, BackColor = Theme.Bg, Padding = new Padding(0, 12, 0, 0) };
-            var barInner = new Panel { Dock = DockStyle.Fill, BackColor = Color.White, Padding = new Padding(14, 8, 14, 8) };
+            var barInner = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Card, Padding = new Padding(14, 8, 14, 8) };
             barInner.Paint += (s, e) => { using (var p = new Pen(Theme.Border)) e.Graphics.DrawRectangle(p, 0, 0, barInner.Width - 1, barInner.Height - 1); };
-            var right = new FlowLayoutPanel { Dock = L.Ar ? DockStyle.Left : DockStyle.Right, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = false, BackColor = Color.White };
+            var right = new FlowLayoutPanel { Dock = L.Ar ? DockStyle.Left : DockStyle.Right, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = false, BackColor = Theme.Card };
             recycle = new CheckBox { Text = L.T("إلى سلة المحذوفات (قابل للاسترجاع)", "To Recycle Bin (restorable)"), Checked = true, AutoSize = true, Font = Theme.Body, Margin = new Padding(0, 9, 14, 0), ForeColor = Theme.Text };
             actBtn = new FlatButton(Actions.Label(section), Actions.IsDestructive(section) ? FlatButton.Kind.Danger : FlatButton.Kind.Primary, Actions.IsDestructive(section) ? Glyph.Delete : Glyph.Check);
             actBtn.Click += (s, e) => DoAction();
@@ -127,7 +127,7 @@ namespace WGuard
 
         LinkLabel MakeLink(string text, LinkLabelLinkClickedEventHandler h)
         {
-            var l = new LinkLabel { Text = text, AutoSize = true, Font = Theme.Body, LinkColor = Theme.Primary, ActiveLinkColor = Theme.PrimaryHover, LinkBehavior = LinkBehavior.HoverUnderline, Margin = new Padding(16, 9, 0, 0) };
+            var l = new LinkLabel { Text = text, AutoSize = true, Font = Theme.Body, LinkColor = Theme.Link, ActiveLinkColor = Theme.Link, LinkBehavior = LinkBehavior.HoverUnderline, Margin = new Padding(16, 9, 0, 0) };
             l.LinkClicked += h;
             return l;
         }
@@ -189,7 +189,8 @@ namespace WGuard
         {
             g.Dock = DockStyle.Fill;
             g.BorderStyle = BorderStyle.None;
-            g.BackgroundColor = Color.White;
+            g.BackgroundColor = Theme.Card;
+            g.DefaultCellStyle.BackColor = Theme.Card;
             g.RowHeadersVisible = false;
             g.AllowUserToAddRows = false;
             g.AllowUserToDeleteRows = false;
@@ -208,22 +209,22 @@ namespace WGuard
                 if (e.RowIndex != -1 || e.ColumnIndex < 0) return;
                 e.Paint(e.CellBounds, DataGridViewPaintParts.All);
                 var b = e.CellBounds;
-                using (var pen = new Pen(Theme.Hex("D5DBE5")))
+                using (var pen = new Pen(Theme.GridLine))
                 {
                     e.Graphics.DrawLine(pen, b.Left, b.Bottom - 1, b.Right, b.Bottom - 1);
                     bool last = e.ColumnIndex == g.Columns.GetLastColumn(DataGridViewElementStates.Visible, DataGridViewElementStates.None).Index;
                     if (!last && g.Columns[e.ColumnIndex].Resizable != DataGridViewTriState.False)
                     {
                         int x = g.RightToLeft == RightToLeft.Yes ? b.Left : b.Right - 1;
-                        using (var dp = new Pen(Theme.Hex("B8C1CE"), 1.5f)) e.Graphics.DrawLine(dp, x, b.Top + 9, x, b.Bottom - 10);
+                        using (var dp = new Pen(Theme.GridDivider, 1.5f)) e.Graphics.DrawLine(dp, x, b.Top + 9, x, b.Bottom - 10);
                     }
                 }
                 e.Handled = true;
             };
             g.RowTemplate.Height = 38;
-            g.ColumnHeadersDefaultCellStyle.BackColor = Theme.Hex("F7F8FB");
+            g.ColumnHeadersDefaultCellStyle.BackColor = Theme.HeaderBg;
             g.ColumnHeadersDefaultCellStyle.ForeColor = Theme.Muted;
-            g.ColumnHeadersDefaultCellStyle.SelectionBackColor = Theme.Hex("F7F8FB");
+            g.ColumnHeadersDefaultCellStyle.SelectionBackColor = Theme.HeaderBg;
             g.ColumnHeadersDefaultCellStyle.Font = Theme.Bold;
             g.ColumnHeadersDefaultCellStyle.Padding = new Padding(6, 0, 6, 0);
             g.DefaultCellStyle.Font = Theme.Body;
@@ -286,7 +287,7 @@ namespace WGuard
                 }
                 else if (col == "name") e.CellStyle.Font = Theme.Bold;
                 else if (col == "detail" || col == "path" || col == "date") e.CellStyle.ForeColor = Theme.Muted;
-                if (r.Action == "" && col == "chk") e.CellStyle.BackColor = Theme.Hex("F7F8FB");
+                if (r.Action == "" && col == "chk") e.CellStyle.BackColor = Theme.HeaderBg;
             };
             g.CellDoubleClick += (s, e) =>
             {
