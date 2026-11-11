@@ -490,10 +490,19 @@ namespace WGuard
                         main.SetBusy(false);
                         Fill();
                         main.RefreshBadges();
-                        string msg = L.T("تم بنجاح: ", "Succeeded: ") + ok + "    " + L.T("فشل: ", "Failed: ") + fail;
-                        if (errors.Count > 0) msg += "\n\n" + string.Join("\n", errors.Take(8).ToArray());
-                        msg += "\n\n" + L.T("التفاصيل في السجل:\n", "Details in the log:\n") + Log.FilePath;
-                        Msg.Show(this, msg, L.T("انتهى", "Done"), MessageBoxButtons.OK, fail > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+                        if (fail == 0)
+                        {
+                            // success: a short message, no details
+                            Msg.Success(this, ok == 1 ? L.T("تم تنفيذ العملية.", "The action was completed.") : L.T("تم تنفيذ العملية على " + ok + " عناصر.", "Completed on " + ok + " items."));
+                        }
+                        else
+                        {
+                            // something failed: show what and where to find the full log
+                            string msg = (ok > 0 ? L.T("نجح: ", "Succeeded: ") + ok + "   ·   " : "") + L.T("لم ينجح: ", "Failed: ") + fail + "\n\n" + string.Join("\n", errors.Take(6).ToArray());
+                            if (errors.Count > 6) msg += "\n...";
+                            msg += "\n\n" + L.T("السجل الكامل: ", "Full log: ") + Log.FilePath;
+                            Msg.Show(this, msg, L.T("لم تكتمل بعض العمليات", "Some actions did not finish"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
                     }));
                 }
                 catch { }
