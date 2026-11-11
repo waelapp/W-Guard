@@ -70,8 +70,12 @@ namespace WGuard
             var th = new Thread(() =>
             {
                 if (Demo.On) { Demo.Load(); try { BeginInvoke((Action)RefreshAll); if (Demo.Shots) BeginInvoke((Action)(() => Demo.TakeShots(this))); } catch { } return; }
+                bool cached = Store.LoadCache();
+                if (cached) try { BeginInvoke((Action)RefreshAll); } catch { }
                 var info = SysInfo.Collect(null);
                 if (Store.Info == null) Store.Info = info;
+                // running programs change after every restart, so this list is always read fresh
+                if (cached) try { var bg = Scanners.ScanBackground(new ScanCtx()); Store.Reset(Scanners.Background); Store.Add(Scanners.Background, bg); } catch { }
                 try { BeginInvoke((Action)RefreshAll); } catch { }
             });
             th.IsBackground = true;
@@ -122,7 +126,15 @@ namespace WGuard
             if (steps.Count == 0) return;
             string title = section == Scanners.Overview ? L.T("جارٍ الفحص الشامل", "Running full scan") : L.T("جارٍ الفحص: ", "Scanning: ") + new ResultsPageTitle(section).Text;
             using (var f = new ScanForm(title, steps)) f.ShowDialog(this);
+            Store.SaveCache();
             RefreshAll();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            // keep what the user already cleaned or changed for the next start
+            Store.SaveCache();
+            base.OnFormClosing(e);
         }
 
         public void SetBusy(bool b)
@@ -203,6 +215,7 @@ namespace WGuard
             flow.Controls.Add(updStatus);
             AddRow(t, "", flow);
 
+            AddRow(t, L.T("اقترح فحصاً شاملاً جديداً بعد (يوم)", "Suggest a new full scan after (days)"), Num(1, 365, Settings.RescanDays, v => Settings.RescanDays = v));
             AddRow(t, L.T("الملف قديم إذا لم يُعدّل منذ (يوم)", "A file is old after (days)"), Num(30, 3650, Settings.OldDays, v => Settings.OldDays = v));
             AddRow(t, L.T("أقل حجم للملف القديم (MB)", "Minimum old file size (MB)"), Num(1, 100000, Settings.OldMinMB, v => Settings.OldMinMB = v));
             AddRow(t, L.T("الملف كبير إذا تجاوز (MB)", "A file is large above (MB)"), Num(50, 100000, Settings.BigMB, v => Settings.BigMB = v));
