@@ -78,7 +78,7 @@ namespace WGuard
                 case Kind.Primary: bg = hover ? Theme.PrimaryHover : Theme.Primary; fg = Color.White; break;
                 case Kind.Danger: bg = hover ? Theme.DangerHover : Theme.Danger; fg = Color.White; break;
                 case Kind.Ghost: bg = hover ? Theme.TealTint : Color.Transparent; fg = Theme.Primary; break;
-                default: bg = hover ? Theme.Bg : Color.White; fg = Theme.Text; border = Theme.Border; break;
+                default: bg = hover ? Theme.Bg : Theme.Card; fg = Theme.Text; border = Theme.Border; break;
             }
             if (!Enabled) { bg = Style == Kind.Ghost ? Color.Transparent : Theme.Track; fg = Theme.Faint; border = Color.Empty; }
             if (down) bg = ControlPaint.Dark(bg, 0.05f);
