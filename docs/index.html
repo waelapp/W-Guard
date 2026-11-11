@@ -220,7 +220,7 @@ footer .brand{font-size:17px}
       <h1 data-i="h1">افحص جهازك، نظّفه، واحمِه<br><span>بقرارك أنت</span></h1>
       <p class="lead" data-i="lead">W-Guard يفحص الكمبيوتر بالكامل ويعطيك تقييماً لصحته، ويكشف ما يأخذ المساحة وما يبطّئ الإقلاع وما يبدو مشبوهاً، ثم يقترح الحل ولا ينفّذ شيئاً إلا بعد أن تختاره وتؤكده.</p>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i="cta_dl">تنزيل W-Guard</span> <small data-i="cta_dl_s">ملف التثبيت</small></a>
+        <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest" data-dl="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i="cta_dl">تنزيل W-Guard</span> <small data-i="cta_dl_s">ملف التثبيت</small></a>
         <a class="btn ghost" href="#features" data-i="cta_tour">جولة في البرنامج</a>
       </div>
       <div class="hlinks"><a href="#how" data-i="hl1">كيف يعمل</a><a href="#compare" data-i="hl2">المقارنة</a><a href="#features" data-i="hl3">الأقسام</a><a href="#safety" data-i="hl4">الخصوصية</a><a href="#download" data-i="hl5">التنزيل</a><a href="https://github.com/waelapp/W-Guard">GitHub</a></div>
@@ -471,13 +471,13 @@ footer .brand{font-size:17px}
         <span class="badge" data-i="dl1_b">الأفضل لأغلب المستخدمين</span>
         <h3 data-i="dl1_h">ملف التثبيت</h3>
         <p data-i="dl1_p">يثبّت البرنامج، ويضيف اختصاراً في قائمة ابدأ وسطح المكتب، ويظهر في «التطبيقات المثبتة» ويُزال منها بسهولة. ينبّهك عند صدور إصدار جديد.</p>
-        <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe">W-Guard-Setup.exe</a>
+        <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest" data-dl="setup"><span data-dlname="setup">W-Guard-Setup.exe</span></a>
       </div>
       <div class="card">
         <span class="badge" style="background:#EEF1F5;color:var(--muted)" data-i="dl2_b">بدون تثبيت</span>
         <h3 data-i="dl2_h">النسخة المحمولة</h3>
         <p data-i="dl2_p">ملف واحد يعمل مباشرة من أي مجلد أو فلاش. مناسب للتجربة السريعة أو لفحص جهاز آخر.</p>
-        <a class="btn out" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard.exe">W-Guard.exe</a>
+        <a class="btn out" href="https://github.com/waelapp/W-Guard/releases/latest" data-dl="portable"><span data-dlname="portable">W-Guard.exe</span></a>
       </div>
     </div>
     <div class="req"><span data-i="rq1">ويندوز 10 أو 11 (64-bit)</span><span data-i="rq2">.NET Framework 4.8 (موجود في ويندوز)</span><span data-i="rq3">صلاحيات المدير</span><span data-i="rq4">حجم أقل من 3 MB</span></div>
@@ -617,6 +617,18 @@ const EN = {
   pp.innerHTML=playing?pause:play;
   pp.addEventListener("click",()=>{playing=!playing; t0=performance.now(); pp.innerHTML=playing?pause:play;});
   (function tick(now){ if(playing){ const f=Math.min(1,(now-t0)/D); bt[i].firstChild.style.width=(f*100)+"%"; if(f>=1) show(i+1);} else t0=now-(parseFloat(bt[i].firstChild.style.width)||0)/100*D; requestAnimationFrame(tick); })(performance.now());
+})();
+// download buttons point to the files of the latest release (their names include the version)
+(function(){
+  fetch("https://api.github.com/repos/waelapp/W-Guard/releases/latest").then(r => r.ok ? r.json() : null).then(j => {
+    if (!j || !j.assets) return;
+    const pick = k => j.assets.find(a => /\.exe$/i.test(a.name) && (k === "setup") === /setup/i.test(a.name));
+    ["setup", "portable"].forEach(k => {
+      const a = pick(k); if (!a) return;
+      document.querySelectorAll('[data-dl="' + k + '"]').forEach(el => el.href = a.browser_download_url);
+      document.querySelectorAll('[data-dlname="' + k + '"]').forEach(el => el.textContent = a.name);
+    });
+  }).catch(() => {});
 })();
 const AR = {};
 document.querySelectorAll("[data-i]").forEach(el => AR[el.dataset.i] = el.innerHTML);
