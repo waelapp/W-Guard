@@ -180,6 +180,8 @@ namespace WGuard
             // start the uninstaller the way Windows "Installed apps" does, so its window opens in front
             string exe, args;
             SplitCommand(cmd, out exe, out args);
+            // a broken install: the program's own uninstaller is gone, so only leftovers remain
+            if (exe != null && exe.Contains("\\") && !File.Exists(exe)) return RemoveBroken(r);
             Native.AllowSetForegroundWindow(-1);
             Process p0 = null;
             try
@@ -199,6 +201,20 @@ namespace WGuard
                 throw new Exception(L.T("لم تكتمل الإزالة - رُبما أُلغيت أو فشلت أداة الإزالة. أعد المحاولة وأكمل خطواتها حتى النهاية.",
                     "Removal was not completed - the uninstaller was cancelled or failed. Try again and follow it to the end."));
             return L.T("أُزيل", "Removed");
+        }
+
+        static string RemoveBroken(Row r)
+        {
+            string note = "";
+            if (!string.IsNullOrEmpty(r.Path) && Directory.Exists(r.Path))
+            {
+                Guard(r.Path);
+                try { FileSystem.DeleteDirectory(r.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin); }
+                catch (Exception ex) { note = " - " + L.T("بعض ملفاته قيد الاستخدام: ", "some files are in use: ") + ex.Message; }
+            }
+            RemoveUninstallEntry(r);
+            Log.Write("broken install cleaned: " + r.Name + " | " + r.Path);
+            return L.T("أداة الإزالة كانت مفقودة - نُقلت ملفاته إلى السلة وأُزيل من القائمة", "Its uninstaller was missing - files moved to the Recycle Bin and the entry removed") + note;
         }
 
         // "C:\Program Files\App\unins000.exe" /x  ->  exe + arguments (quoted or not)
