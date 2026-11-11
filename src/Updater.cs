@@ -38,7 +38,41 @@ namespace WGuard
             return r;
         }
 
+        // GitHub's API allows a limited number of anonymous requests per hour from one internet address
+        // (shared networks can run out). When it refuses, the public "latest release" link is used instead.
         public static ReleaseInfo GetLatest()
+        {
+            try { return GetLatestApi(); }
+            catch (WebException ex)
+            {
+                Log.Write("update api: " + ex.Message + " - using the releases page");
+                return GetLatestWeb();
+            }
+        }
+
+        static ReleaseInfo GetLatestWeb()
+        {
+            string repo = "https://github.com/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName;
+            var req = Req(repo + "/releases/latest");
+            req.Method = "HEAD";
+            req.AllowAutoRedirect = false;
+            string loc;
+            using (var resp = (HttpWebResponse)req.GetResponse()) loc = resp.Headers["Location"] ?? "";
+            Match t = Regex.Match(loc, @"/releases/tag/([^/?#]+)");
+            if (!t.Success) throw new WebException("no release found");
+            var info = new ReleaseInfo();
+            info.Tag = Uri.UnescapeDataString(t.Groups[1].Value);
+            info.Page = repo + "/releases/tag/" + t.Groups[1].Value;
+            info.Notes = L.T("التفاصيل في صفحة الإصدار.", "See the release page for details.");
+            string dl = repo + "/releases/download/" + t.Groups[1].Value + "/";
+            info.ExeUrl = dl + "W-Guard.exe"; info.ShaUrl = dl + "W-Guard.exe.sha256";
+            info.SetupUrl = dl + "W-Guard-Setup.exe"; info.SetupShaUrl = dl + "W-Guard-Setup.exe.sha256";
+            Match m = Regex.Match(info.Tag, @"(\d+)\.(\d+)(\.(\d+))?");
+            info.Version = m.Success ? new Version(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), m.Groups[4].Success ? int.Parse(m.Groups[4].Value) : 0) : new Version(0, 0);
+            return info;
+        }
+
+        static ReleaseInfo GetLatestApi()
         {
             var req = Req("https://api.github.com/repos/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName + "/releases/latest");
             req.Accept = "application/vnd.github+json";
