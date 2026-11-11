@@ -57,6 +57,40 @@ h1 span{color:var(--teal)}
 .shot{border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.45);background:#fff}
 .hero .shot{margin:8px auto 0;max-width:1040px;border-radius:14px 14px 0 0;border-bottom:0}
 
+/* hero links + badges */
+.hlinks{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;margin-top:18px;font-size:15px}
+.hlinks a{color:#C9D1DE;text-decoration:none;border-bottom:1px dashed rgba(201,209,222,.35)}
+.hlinks a:hover{color:var(--teal);border-color:var(--teal)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px;direction:ltr}
+.badges img{height:20px;width:auto;display:inline-block}
+/* demo player */
+.player{position:relative;margin:8px auto 0;max-width:1040px;border-radius:14px 14px 0 0;overflow:hidden;border:1px solid var(--line);border-bottom:0;box-shadow:0 30px 80px rgba(0,0,0,.45);background:var(--navy2)}
+.player .bar{display:flex;align-items:center;gap:8px;height:34px;padding:0 14px;background:#0B1220;border-bottom:1px solid var(--line);direction:ltr}
+.player .bar i{width:10px;height:10px;border-radius:50%;background:#2A3448;display:block}
+.player .bar span{margin-left:8px;color:#8892A4;font-size:12.5px;font-style:normal}
+.frames{position:relative;aspect-ratio:1304/821;background:#fff}
+.frames img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease}
+.frames img.on{opacity:1}
+.chapters{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#0B1220;border-top:1px solid var(--line)}
+.chapters button{position:relative;background:none;border:0;color:#8892A4;font:inherit;font-size:13px;padding:12px 6px 14px;cursor:pointer;border-inline-start:1px solid var(--line)}
+.chapters button:first-child{border-inline-start:0}
+.chapters button.on{color:#fff}
+.chapters button:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--line)}
+.chapters button .p{position:absolute;inset-inline-start:0;top:0;height:3px;width:0;background:var(--teal)}
+.chapters button.done .p{width:100%}
+.player .play{position:absolute;bottom:58px;inset-inline-end:14px;z-index:2;width:36px;height:36px;border-radius:50%;border:0;background:rgba(17,24,39,.75);color:#fff;cursor:pointer;display:grid;place-items:center}
+/* compare */
+.cmp{width:100%;max-width:980px;margin:36px auto 0;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);font-size:15.5px}
+.cmp th,.cmp td{padding:13px 14px;border-top:1px solid var(--border);text-align:center}
+.cmp thead th{border-top:0;background:#F8FAFC;font-size:14.5px;color:var(--muted);font-weight:600}
+.cmp thead th.me{background:var(--navy);color:#fff}
+.cmp td:first-child,.cmp th:first-child{text-align:start;color:var(--text)}
+.cmp td.me{background:var(--tint)}
+.y,.n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-weight:700;font-size:14px}
+.y{background:var(--okbg);color:var(--ok)}.n{background:#F1F3F6;color:#A3ACBA}
+.cmp-wrap{overflow-x:auto}
+.cmp-note{max-width:980px;margin:10px auto 0;color:var(--faint);font-size:13.5px;text-align:start}
+
 /* sections */
 section{padding:84px 0}
 .kicker{color:var(--primary);font-weight:700;font-size:14px;letter-spacing:.4px}
@@ -134,6 +168,8 @@ footer .brand{font-size:17px}
 
 @media (max-width:900px){
   .links{display:none}
+  .chapters{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .chapters button:nth-child(n+5){border-top:1px solid var(--line)}
   .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
   .steps,.dl{grid-template-columns:1fr}
   .feature,.feature.flip{grid-template-columns:1fr;gap:22px}
@@ -156,6 +192,7 @@ footer .brand{font-size:17px}
     <a class="brand" href="#top"><img src="img/logo.png" alt="">W-Guard</a>
     <nav class="links">
       <a href="#how" data-i="nav_how">كيف يعمل</a>
+      <a href="#compare" data-i="nav_compare">المقارنة</a>
       <a href="#features" data-i="nav_features">الأقسام</a>
       <a href="#safety" data-i="nav_safety">الأمان</a>
       <a href="#download" data-i="nav_download">التنزيل</a>
@@ -176,9 +213,31 @@ footer .brand{font-size:17px}
         <a class="btn primary" href="https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i="cta_dl">تنزيل W-Guard</span> <small data-i="cta_dl_s">ملف التثبيت</small></a>
         <a class="btn ghost" href="#features" data-i="cta_tour">جولة في البرنامج</a>
       </div>
-      <div class="tags"><span data-i="tag1">عربي و English</span><span data-i="tag2">بدون إعلانات أو تتبّع</span><span data-i="tag3">الحذف إلى سلة المحذوفات</span><span data-i="tag4">مفتوح المصدر بالكامل</span></div>
+      <div class="hlinks"><a href="#how" data-i="hl1">كيف يعمل</a><a href="#compare" data-i="hl2">المقارنة</a><a href="#features" data-i="hl3">الأقسام</a><a href="#safety" data-i="hl4">الخصوصية</a><a href="#download" data-i="hl5">التنزيل</a><a href="https://github.com/waelapp/W-Guard">GitHub</a></div>
+      <div class="badges">
+        <a href="https://github.com/waelapp/W-Guard/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/waelapp/W-Guard/build.yml?branch=main&label=build&logo=github" alt="build"></a>
+        <a href="https://github.com/waelapp/W-Guard/releases/latest"><img src="https://img.shields.io/github/v/release/waelapp/W-Guard?label=release&color=00D6A0" alt="release"></a>
+        <a href="https://github.com/waelapp/W-Guard/releases"><img src="https://img.shields.io/github/downloads/waelapp/W-Guard/total?label=downloads&color=08876A" alt="downloads"></a>
+        <a href="https://github.com/waelapp/W-Guard/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-1C2536" alt="license"></a>
+        <img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6" alt="platform">
+        <img src="https://img.shields.io/badge/telemetry-none-00D6A0" alt="telemetry: none">
+        <img src="https://img.shields.io/badge/UI-%D8%B9%D8%B1%D8%A8%D9%8A%20%7C%20English-08876A" alt="Arabic | English">
+      </div>
     </div>
-    <div class="shot"><img src="img/overview.png" alt="W-Guard overview" width="1301" height="851"></div>
+    <div class="player" id="player">
+      <div class="bar"><i></i><i></i><i></i><span>W-Guard · <em data-i="demo_tag" style="font-style:normal">بيانات تجريبية</em></span></div>
+      <div class="frames">
+        <img src="img/overview.png" alt="" class="on" width="1304" height="821">
+        <img src="img/scan-modal.png" alt="" loading="lazy" width="1304" height="821">
+        <img src="img/security.png" alt="" loading="lazy" width="1304" height="821">
+        <img src="img/background.png" alt="" loading="lazy" width="1304" height="821">
+        <img src="img/space.png" alt="" loading="lazy" width="1304" height="821">
+        <img src="img/desk-modal.png" alt="" loading="lazy" width="1304" height="821">
+        <img src="img/cleanup.png" alt="" loading="lazy" width="1304" height="821">
+      </div>
+      <button class="play" id="pp" type="button" aria-label="pause"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button>
+      <div class="chapters"><button type="button" class="on"><span class="p"></span><span data-i="ch1">نظرة عامة</span></button><button type="button"><span class="p"></span><span data-i="ch2">الفحص</span></button><button type="button"><span class="p"></span><span data-i="ch3">الأمان</span></button><button type="button"><span class="p"></span><span data-i="ch4">الخلفية</span></button><button type="button"><span class="p"></span><span data-i="ch5">المساحة</span></button><button type="button"><span class="p"></span><span data-i="ch6">سطح المكتب</span></button><button type="button"><span class="p"></span><span data-i="ch7">التنظيف</span></button></div>
+    </div>
   </div>
 </div>
 
@@ -192,6 +251,28 @@ footer .brand{font-size:17px}
       <div class="card step"><h3 data-i="s2_h">راجع</h3><p data-i="s2_p">تحصل على تقييم لصحة الجهاز من 100 وتنبيهات مرتبة بالأهمية. كل عنصر معه سبب واضح: لماذا يُقترح حذفه أو تعطيله، وكم يوفّر.</p></div>
       <div class="card step"><h3 data-i="s3_h">نفّذ</h3><p data-i="s3_p">حدد ما تريد، وستظهر نافذة تأكيد بكل العناصر قبل التنفيذ. الحذف إلى سلة المحذوفات افتراضياً، وكل عملية تُسجَّل ويمكن التراجع عنها.</p></div>
     </div>
+  </div>
+</section>
+
+<section id="compare" style="padding-top:0">
+  <div class="wrap center">
+    <div class="kicker" data-i="cm_k">المقارنة</div>
+    <h2 data-i="cm_h">كيف يختلف W-Guard؟</h2>
+    <p class="sub" data-i="cm_s">مقارنة بالأدوات المعروفة لتنظيف ويندوز.</p>
+    <div class="cmp-wrap"><table class="cmp">
+      <thead><tr><th></th><th class="me">W-Guard</th><th data-i="cm_cc">CCleaner (المجاني)</th><th>BleachBit</th><th data-i="cm_dc">تنظيف القرص في ويندوز</th></tr></thead>
+      <tbody>
+<tr><td data-i="c1">مجاني بالكامل بدون نسخة مدفوعة</td><td class="me"><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+<tr><td data-i="c2">مفتوح المصدر</td><td class="me"><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="y">✓</span></td><td><span class="n">✕</span></td></tr>
+<tr><td data-i="c3">تنظيف الملفات المؤقتة والكاش</td><td class="me"><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+<tr><td data-i="c4">أكبر المجلدات والملفات في كل الأقراص</td><td class="me"><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td></tr>
+<tr><td data-i="c5">إدارة برامج بدء التشغيل</td><td class="me"><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td></tr>
+<tr><td data-i="c6">تقييم خطورة التشغيل التلقائي والمهام المجدولة</td><td class="me"><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td></tr>
+<tr><td data-i="c7">ألعاب Steam و Epic و Xbox بالحجم وآخر تشغيل</td><td class="me"><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td></tr>
+<tr><td data-i="c8">ترتيب سطح المكتب مع زر تراجع</td><td class="me"><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td></tr>
+<tr><td data-i="c9">تقييم صحة الجهاز من 100</td><td class="me"><span class="y">✓</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td><td><span class="n">✕</span></td></tr>
+      </tbody>
+    </table></div>
   </div>
 </section>
 
@@ -390,7 +471,7 @@ footer .brand{font-size:17px}
       </div>
     </div>
     <div class="req"><span data-i="rq1">ويندوز 10 أو 11 (64-bit)</span><span data-i="rq2">.NET Framework 4.8 (موجود في ويندوز)</span><span data-i="rq3">صلاحيات المدير</span><span data-i="rq4">حجم أقل من 3 MB</span></div>
-    <div class="note" data-i="dl_note">قد تظهر رسالة ويندوز الزرقاء «Windows protected your PC» لأن البرنامج جديد وغير موقّع بشهادة تجارية. اضغط «More info» ثم «Run anyway». للتأكد أن الملف أصلي قارن بصمته بملف <code>.sha256</code> الموجود مع الإصدار: <code>Get-FileHash W-Guard-Setup.exe</code></div>
+    <div class="note" data-i="dl_note">قد تظهر رسالة ويندوز الزرقاء «Windows protected your PC» لأن البرنامج جديد. اضغط «More info» ثم «Run anyway». ونزّل البرنامج دائماً من صفحة الإصدارات الرسمية فقط.</div>
   </div>
 </section>
 
@@ -407,7 +488,6 @@ footer .brand{font-size:17px}
       <details><summary data-i="q4">هل يرسل أي بيانات عن جهازي؟</summary><p data-i="a4">لا. الاتصال الوحيد هو قراءة صفحة الإصدارات على GitHub للتحقق من وجود تحديث، ويمكنك إيقافه من الإعدادات.</p></details>
       <details><summary data-i="q5">رتبت سطح المكتب ولم يعجبني، كيف أرجعه؟</summary><p data-i="a5">من قسم «ترتيب سطح المكتب» اضغط «تراجع عن الترتيب» وسيعود كل عنصر لمكانه وتُحذف المجلدات الفارغة.</p></details>
       <details><summary data-i="q6">هل يغني عن برنامج الحماية؟</summary><p data-i="a6">لا، W-Guard ليس مضاد فيروسات. هو يعتمد على Microsoft Defender ويكمّله بكشف التشغيل التلقائي المشبوه والبرامج غير المرغوبة.</p></details>
-      <details><summary data-i="q8">هل البرنامج آمن؟ وماذا عن تنبيهات بعض برامج الحماية؟</summary><p data-i="a8">الكود مفتوح بالكامل ويمكن لأي أحد مراجعته. Microsoft Defender و Kaspersky و BitDefender وغيرها لا تعطي أي تنبيه. بعض الفاحصات التي تعتمد على الذكاء الاصطناعي قد تشك في أي برنامج جديد غير موقّع رقمياً يطلب صلاحيات المدير، وهذا إنذار خاطئ نعمل على إزالته بالتوقيع الرقمي. يمكنك رؤية نتيجة الفحص بنفسك: <a href="https://www.virustotal.com/gui/file/b0f518b472f5fda6b5182c79a457f76f56a3912d753d73df012aaa8bb7eab8cf" target="_blank" rel="noopener">ملف التثبيت</a> · <a href="https://www.virustotal.com/gui/file/e4d013de24c0d06b329bfe64df3fa0bad4db971cc205f9146422605d9088f32e" target="_blank" rel="noopener">النسخة المحمولة</a></p></details>
       <details><summary data-i="q7">كيف أزيله؟</summary><p data-i="a7">من الإعدادات ← التطبيقات المثبتة ← W-Guard ← إلغاء التثبيت. والنسخة المحمولة يكفي حذف الملف.</p></details>
     </div>
   </div>
@@ -415,16 +495,9 @@ footer .brand{font-size:17px}
 
 <section id="policy" style="background:#fff;border-top:1px solid var(--border);padding:56px 0">
   <div class="wrap">
-    <div class="grid2">
-      <div>
-        <h3 data-i="cs_h">سياسة توقيع الكود (Code signing policy)</h3>
-        <p data-i="cs_p">يُبنى W-Guard تلقائياً من هذا المستودع عبر GitHub Actions، ولا يُوقَّع إلا ما بُني من الكود المنشور. Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a> (قيد المراجعة).</p>
-        <p data-i="cs_r"><b>الأدوار:</b> المؤلف والمراجع والمعتمد لكل إصدار: <a href="https://github.com/waelapp">WAEL (waelapp)</a>.</p>
-      </div>
-      <div>
-        <h3 data-i="pv_h">سياسة الخصوصية</h3>
-        <p data-i="pv_p">W-Guard لا يرسل أي معلومات عن جهازك. الاتصال الوحيد هو طلب واحد عند التشغيل إلى api.github.com لمعرفة رقم آخر إصدار، ويمكنك إيقافه من الإعدادات. لا يُنقل أي شيء آخر إلا إذا طلبته أنت صراحةً.</p>
-      </div>
+    <div style="max-width:860px">
+      <h3 data-i="pv_h" style="margin:0 0 8px;font-size:19px">سياسة الخصوصية</h3>
+      <p data-i="pv_p" style="color:var(--muted);margin:0">W-Guard لا يرسل أي معلومات عن جهازك. الاتصال الوحيد هو طلب واحد عند التشغيل إلى api.github.com لمعرفة رقم آخر إصدار، ويمكنك إيقافه من الإعدادات. لا يُنقل أي شيء آخر إلا إذا طلبته أنت صراحةً.</p>
     </div>
   </div>
 </section>
@@ -433,7 +506,7 @@ footer .brand{font-size:17px}
   <div class="wrap">
     <a class="brand" href="#top"><img src="img/logo.png" alt="" width="26" height="26">W-Guard</a>
     <span>© 2026 WAEL · <span data-i="ft_l">مفتوح المصدر بترخيص</span> <a href="https://github.com/waelapp/W-Guard/blob/main/LICENSE">GPL-3.0</a> · <a href="https://github.com/waelapp">github.com/waelapp</a></span>
-    <a href="#policy" data-i="ft_cs">سياسة توقيع الكود والخصوصية</a>
+    <a href="#policy" data-i="ft_cs">سياسة الخصوصية</a>
     <span data-i="ft_t">اسم W-Guard والشعار ملك لـ WAEL.</span>
   </div>
 </footer>
@@ -489,7 +562,7 @@ const EN = {
   dl1_b:"Best for most people", dl1_h:"Installer", dl1_p:"Installs W-Guard, adds Start menu and desktop shortcuts, shows up in “Installed apps” for easy removal, and lets you know when a new version ships.",
   dl2_b:"No install", dl2_h:"Portable", dl2_p:"A single file that runs from any folder or USB stick. Great for a quick try or checking another PC.",
   rq1:"Windows 10 or 11 (64-bit)", rq2:".NET Framework 4.8 (built into Windows)", rq3:"Administrator rights", rq4:"Under 3 MB",
-  dl_note:"Windows may show the blue “Windows protected your PC” message because the app is new and not signed with a commercial certificate. Click “More info” then “Run anyway”. To make sure the file is genuine, compare its hash with the <code>.sha256</code> file in the release: <code>Get-FileHash W-Guard-Setup.exe</code>",
+  dl_note:"Windows may show the blue “Windows protected your PC” message because the app is new. Click “More info” then “Run anyway”. Always download from the official releases page only.",
   fq_k:"FAQ", fq_h:"Before you start",
   q1:"Is it free?", a1:"Yes — completely free with no ads, and open source under GPL-3.0.",
   q2:"Does it delete anything without asking?", a2:"No. Scanning is read-only, and any delete or disable requires you to select items and approve a confirmation window that lists them all.",
@@ -498,14 +571,28 @@ const EN = {
   q5:"I organized my desktop and don't like it — how do I revert?", a5:"In “Desktop organizer” press “Undo organizing”: every item returns to its place and empty folders are removed.",
   q6:"Does it replace my antivirus?", a6:"No, W-Guard is not an antivirus. It relies on Microsoft Defender and complements it by spotting suspicious autostarts and unwanted programs.",
   q7:"How do I uninstall it?", a7:"Settings → Apps → Installed apps → W-Guard → Uninstall. For the portable version just delete the file.",
-  vt_h:"Scanned on VirusTotal", vt_p:"Every release file is uploaded to VirusTotal and checked by 70+ antivirus engines. Click to see the result yourself — the hash in the link matches the <code>.sha256</code> file.", vt_1:"Installer result", vt_2:"Portable result",
-  q8:"Is it safe? What about warnings from some antivirus engines?", a8:"The code is fully open for anyone to review. Microsoft Defender, Kaspersky, BitDefender and others raise no warning. A few AI-based scanners may distrust any new, unsigned program that asks for admin rights — a false positive we are removing with code signing. See the scan yourself: <a href=\"https://www.virustotal.com/gui/file/b0f518b472f5fda6b5182c79a457f76f56a3912d753d73df012aaa8bb7eab8cf\" target=\"_blank\" rel=\"noopener\">installer</a> · <a href=\"https://www.virustotal.com/gui/file/e4d013de24c0d06b329bfe64df3fa0bad4db971cc205f9146422605d9088f32e\" target=\"_blank\" rel=\"noopener\">portable</a>",
-  cs_h:"Code signing policy", cs_p:"W-Guard is built automatically from this repository with GitHub Actions, and only binaries built from the published source are signed. Free code signing provided by <a href=\"https://signpath.io\">SignPath.io</a>, certificate by <a href=\"https://signpath.org\">SignPath Foundation</a> (in review).",
-  cs_r:"<b>Roles:</b> author, reviewer and approver of every release: <a href=\"https://github.com/waelapp\">WAEL (waelapp)</a>.",
   pv_h:"Privacy policy", pv_p:"W-Guard sends no information about your PC. Its only connection is one request at start to api.github.com to read the latest version number, which you can turn off in Settings. Nothing else is transferred unless you explicitly ask for it.",
-  ft_cs:"Code signing & privacy policy",
+  ft_cs:"Privacy policy",
+  nav_compare:"Compare", hl1:"How it works", hl2:"Compare", hl3:"Features", hl4:"Privacy", hl5:"Download",
+  demo_tag:"sample data", ch1:"Overview", ch2:"Scan", ch3:"Security", ch4:"Background", ch5:"Space", ch6:"Desktop", ch7:"Cleanup",
+  cm_k:"Compare", cm_h:"How is W-Guard different?", cm_s:"Compared with well-known Windows cleanup tools.", cm_cc:"CCleaner (free)", cm_dc:"Windows Disk Cleanup",
+  c1:"Completely free, no paid edition", c2:"Open source", c3:"Temp files and cache cleanup", c4:"Largest folders and files on every drive", c5:"Startup programs manager",
+  c6:"Risk rating for autostart entries and scheduled tasks", c7:"Steam, Epic and Xbox games with size and last played", c8:"Desktop organizer with Undo", c9:"PC health score out of 100", c10:"Full Arabic interface designed from day one",
   ft_l:"Open source under", ft_t:"The W-Guard name and logo belong to WAEL."
 };
+(function(){
+  const P=document.getElementById("player"); if(!P) return;
+  const im=[...P.querySelectorAll(".frames img")], bt=[...P.querySelectorAll(".chapters button")], pp=document.getElementById("pp");
+  const D=3800; let i=0, t0=performance.now(), playing=!matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function show(n){ i=(n+im.length)%im.length; t0=performance.now();
+    im.forEach((x,k)=>x.classList.toggle("on",k===i));
+    bt.forEach((b,k)=>{b.classList.toggle("on",k===i); b.classList.toggle("done",k<i); b.firstChild.style.width=k<i?"100%":"0";}); }
+  bt.forEach((b,k)=>b.addEventListener("click",()=>show(k)));
+  const pause='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>', play='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
+  pp.innerHTML=playing?pause:play;
+  pp.addEventListener("click",()=>{playing=!playing; t0=performance.now(); pp.innerHTML=playing?pause:play;});
+  (function tick(now){ if(playing){ const f=Math.min(1,(now-t0)/D); bt[i].firstChild.style.width=(f*100)+"%"; if(f>=1) show(i+1);} else t0=now-(parseFloat(bt[i].firstChild.style.width)||0)/100*D; requestAnimationFrame(tick); })(performance.now());
+})();
 const AR = {};
 document.querySelectorAll("[data-i]").forEach(el => AR[el.dataset.i] = el.innerHTML);
 function setLang(l){
