@@ -18,6 +18,8 @@ namespace WGuard
     // ------------------------------------------------------------------ scan window
     class ScanForm : Form
     {
+        protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
+
         readonly List<ScanStep> steps;
         readonly ScanCtx ctx = new ScanCtx();
         readonly Stopwatch sw = new Stopwatch();
@@ -58,7 +60,7 @@ namespace WGuard
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false; ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            BackColor = Color.White;
+            BackColor = Theme.Card;
             Font = Theme.Body;
             RightToLeft = L.Ar ? RightToLeft.Yes : RightToLeft.No;
             ClientSize = new Size(640, 384 + steps.Count * 34);
@@ -200,6 +202,8 @@ namespace WGuard
     // ------------------------------------------------------------------ update window (two steps: download from GitHub, then run it)
     class UpdateForm : Form
     {
+        protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
+
         readonly ReleaseInfo rel;
         readonly bool installed;
 
@@ -211,7 +215,7 @@ namespace WGuard
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false; ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            BackColor = Color.White;
+            BackColor = Theme.Card;
             Font = Theme.Body;
             RightToLeft = L.Ar ? RightToLeft.Yes : RightToLeft.No;
             ClientSize = new Size(600, 520);
@@ -270,7 +274,7 @@ namespace WGuard
             TextRenderer.DrawText(g, Glyph.Shield, Theme.Icon, M(new Rectangle(note.X + 10, note.Y, 26, note.Height)), Theme.Ok, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             Theme.Txt(g, L.T("نزّل التحديثات من صفحة البرنامج الرسمية فقط. البرنامج لا يرسل أي بيانات عن جهازك، ويمكنك إيقاف التحقق من التحديثات من الإعدادات.",
                 "Only download updates from the official page. W-Guard sends no data about your PC, and you can turn off update checks in Settings."),
-                Theme.Small, Theme.Hex("1F4D36"), M(new Rectangle(note.X + 40, note.Y + 4, note.Width - 52, note.Height - 8)), Theme.Align.Start, true, true);
+                Theme.Small, Theme.NoteText, M(new Rectangle(note.X + 40, note.Y + 4, note.Width - 52, note.Height - 8)), Theme.Align.Start, true, true);
         }
 
         static void Step(Graphics g, int n, string text, int y, int W)
