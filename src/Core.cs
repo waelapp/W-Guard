@@ -584,6 +584,9 @@ namespace WGuard
     // ------------------------------------------------------------------ native
     static class Native
     {
+        [DllImport("user32.dll")] public static extern bool ReleaseCapture();
+        [DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, IntPtr l);
+
         [StructLayout(LayoutKind.Sequential)]
         public struct SHQUERYRBINFO { public int cbSize; public long i64Size; public long i64NumItems; }
 
