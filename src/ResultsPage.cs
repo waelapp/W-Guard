@@ -49,6 +49,13 @@ namespace WGuard
             var none = MakeLink(L.T("إلغاء التحديد", "Clear selection"), (s, e) => SetAll(false));
             countLbl = new Label { AutoSize = true, Font = Theme.Body, ForeColor = Theme.Muted, Margin = new Padding(16, 9, 0, 0) };
             tool.Controls.AddRange(new Control[] { search, onlyRisk, all, none, countLbl });
+            if (section == Scanners.Background)
+            {
+                // one click: everything the advice marks as not needed at startup
+                var opt = MakeLink(L.T("تحديد غير الضروري للإقلاع", "Select not needed at startup"), (s, e) => SetWhere(r => r.Action == "DisableStartup" && r.Level == 1));
+                tool.Controls.Add(opt);
+                tool.Controls.SetChildIndex(opt, tool.Controls.IndexOf(all));
+            }
 
             // ---- table card
             card = new Panel { Dock = DockStyle.Fill, BackColor = Color.White, Padding = new Padding(1) };
@@ -357,10 +364,18 @@ namespace WGuard
 
         void SetAll(bool v)
         {
+            // "select all" never picks items the advice says to keep (Windows, drivers, security)
+            if (v) SetWhere(r => r.Level != 3);
+            else SetWhere(r => false);
+        }
+
+        void SetWhere(Func<Row, bool> pick)
+        {
             foreach (DataGridViewRow gr in grid.Rows)
             {
                 var r = gr.Tag as Row;
                 if (r == null || r.Action == "") continue;
+                bool v = pick(r);
                 r.Check = v;
                 gr.Cells[0].Value = v;
             }
