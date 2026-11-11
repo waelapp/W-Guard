@@ -22,28 +22,29 @@ namespace WGuard
     {
         public static DialogResult Show(IWin32Window owner, string text, string title, MessageBoxButtons b, MessageBoxIcon i)
         {
-            using (var f = new MsgForm(text, title, b == MessageBoxButtons.YesNo, i == MessageBoxIcon.Error ? MsgForm.Kind.Error : i == MessageBoxIcon.Warning ? MsgForm.Kind.Warning : i == MessageBoxIcon.Question ? MsgForm.Kind.Question : MsgForm.Kind.Info))
-                return owner == null ? f.ShowDialog() : f.ShowDialog(owner);
+            return Open(owner, new MsgForm(text, title, b == MessageBoxButtons.YesNo, i == MessageBoxIcon.Error ? MsgForm.Kind.Error : i == MessageBoxIcon.Warning ? MsgForm.Kind.Warning : i == MessageBoxIcon.Question ? MsgForm.Kind.Question : MsgForm.Kind.Info, null));
         }
         public static void Info(IWin32Window owner, string text) { Show(owner, text, AppInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Information); }
-        public static void Success(IWin32Window owner, string text)
-        {
-            using (var f = new MsgForm(text, "", false, MsgForm.Kind.Success)) { if (owner == null) f.ShowDialog(); else f.ShowDialog(owner); }
-        }
+        public static void Success(IWin32Window owner, string text) { Open(owner, new MsgForm(text, "", false, MsgForm.Kind.Success, null)); }
+        // a short message with the details folded under "Show details"
+        public static void Problem(IWin32Window owner, string text, string title, string details) { Open(owner, new MsgForm(text, title, false, MsgForm.Kind.Warning, details)); }
+        static DialogResult Open(IWin32Window owner, MsgForm f) { using (f) return owner == null ? f.ShowDialog() : f.ShowDialog(owner); }
     }
 
     class MsgForm : Form
     {
         public enum Kind { Info, Success, Warning, Error, Question }
-        readonly string title, text;
+        readonly string title, text, details;
         readonly Kind kind;
+        readonly bool yesNo;
         const int W = 460, Pad = 26;
-        Rectangle textRect, titleRect, iconRect;
+        Rectangle textRect, titleRect, iconRect, toggleRect, detailsRect;
+        bool expanded, hoverToggle;
         FlatButton yes, no;
 
-        public MsgForm(string text, string title, bool yesNo, Kind kind)
+        public MsgForm(string text, string title, bool yesNo, Kind kind, string details)
         {
-            this.text = text ?? ""; this.title = title ?? ""; this.kind = kind;
+            this.text = text ?? ""; this.title = title ?? ""; this.kind = kind; this.yesNo = yesNo; this.details = details ?? "";
             if (this.title == AppInfo.Name || this.title.Length == 0)
                 this.title = kind == Kind.Success ? L.T("تم بنجاح", "Done") : kind == Kind.Error ? L.T("حدث خطأ", "Something went wrong") : kind == Kind.Warning ? L.T("تنبيه", "Heads up") : kind == Kind.Question ? L.T("تأكيد", "Please confirm") : AppInfo.Name;
             SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
@@ -55,37 +56,63 @@ namespace WGuard
             KeyPreview = true;
             Text = AppInfo.Name;
 
-            int tx = Pad + 56, tw = W - tx - Pad;
-            int th = TextRenderer.MeasureText(this.title, Theme.H2, new Size(tw, 0), TextFormatFlags.WordBreak).Height;
-            int bh = this.text.Length == 0 ? 0 : TextRenderer.MeasureText(this.text, Theme.Body, new Size(tw, 0), TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix).Height;
-            titleRect = new Rectangle(tx, Pad + 2, tw, th);
-            textRect = new Rectangle(tx, titleRect.Bottom + 6, tw, bh);
-            iconRect = new Rectangle(Pad, Pad, 42, 42);
-            int by = Math.Max(iconRect.Bottom, textRect.Bottom) + 24;
-            ClientSize = new Size(W, by + 38 + Pad);
-
             yes = new FlatButton(yesNo ? L.T("نعم، متابعة", "Yes, continue") : L.T("حسناً", "OK"), kind == Kind.Error ? FlatButton.Kind.Danger : FlatButton.Kind.Primary, "");
             yes.Click += (s, e) => { DialogResult = yesNo ? DialogResult.Yes : DialogResult.OK; Close(); };
             Controls.Add(yes);
-            int x = W - Pad;
-            yes.Location = new Point(x - yes.Width, by); x -= yes.Width + 10;
             if (yesNo)
             {
                 no = new FlatButton(L.T("لا", "No"), FlatButton.Kind.Secondary, "");
                 no.Click += (s, e) => { DialogResult = DialogResult.No; Close(); };
                 Controls.Add(no);
-                no.Location = new Point(x - no.Width, by);
             }
-            if (L.Ar) foreach (Control c in Controls) c.Left = W - c.Right;
+            Layout2();
+
             KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.Escape) { DialogResult = yesNo ? DialogResult.No : DialogResult.OK; Close(); }
                 else if (e.KeyCode == Keys.Enter) { DialogResult = yesNo ? (ActiveControl == no ? DialogResult.No : DialogResult.Yes) : DialogResult.OK; Close(); }
-                else if (e.Control && e.KeyCode == Keys.C) { try { Clipboard.SetText(this.title + "\n" + this.text); } catch { } }
+                else if (e.Control && e.KeyCode == Keys.C) { try { Clipboard.SetText(this.title + "\n" + this.text + (this.details.Length > 0 ? "\n\n" + this.details : "")); } catch { } }
             };
-            // a borderless window can still be dragged by its body
-            MouseDown += (s, e) => { if (e.Button == MouseButtons.Left) { Native.ReleaseCapture(); Native.SendMessage(Handle, 0xA1, (IntPtr)2, IntPtr.Zero); } };
+            MouseMove += (s, e) => { bool h = this.details.Length > 0 && MR(toggleRect).Contains(e.Location); if (h != hoverToggle) { hoverToggle = h; Cursor = h ? Cursors.Hand : Cursors.Default; Invalidate(); } };
+            MouseDown += (s, e) =>
+            {
+                if (e.Button != MouseButtons.Left) return;
+                if (this.details.Length > 0 && MR(toggleRect).Contains(e.Location)) { expanded = !expanded; Layout2(); Invalidate(); return; }
+                // a borderless window can still be dragged by its body
+                Native.ReleaseCapture(); Native.SendMessage(Handle, 0xA1, (IntPtr)2, IntPtr.Zero);
+            };
         }
+
+        void Layout2()
+        {
+            int tx = Pad + 56, tw = W - tx - Pad;
+            int th = TextRenderer.MeasureText(title, Theme.H2, new Size(tw, 0), TextFormatFlags.WordBreak).Height;
+            int bh = text.Length == 0 ? 0 : TextRenderer.MeasureText(text, Theme.Body, new Size(tw, 0), TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix).Height;
+            iconRect = new Rectangle(Pad, Pad, 42, 42);
+            titleRect = new Rectangle(tx, Pad + 2, tw, th);
+            textRect = new Rectangle(tx, titleRect.Bottom + 6, tw, bh);
+            int y = Math.Max(iconRect.Bottom, textRect.Bottom) + 16;
+            if (details.Length > 0)
+            {
+                toggleRect = new Rectangle(tx, y, 170, 24);
+                y = toggleRect.Bottom + 6;
+                if (expanded)
+                {
+                    int dh = TextRenderer.MeasureText(details, Theme.Small, new Size(tw - 24, 0), TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix).Height;
+                    detailsRect = new Rectangle(tx, y, tw, Math.Min(dh, 260) + 20);
+                    y = detailsRect.Bottom + 6;
+                }
+            }
+            int by = y + 12;
+            ClientSize = new Size(W, by + 38 + Pad);
+            int x = W - Pad;
+            yes.Location = new Point(x - yes.Width, by); x -= yes.Width + 10;
+            if (no != null) no.Location = new Point(x - no.Width, by);
+            if (L.Ar) foreach (Control c in Controls) c.Left = W - c.Left - c.Width;
+            if (IsHandleCreated && Owner != null) Location = new Point(Location.X, Math.Max(0, Owner.Top + (Owner.Height - Height) / 2));
+        }
+
+        public void ExpandDetails() { if (details.Length > 0) { expanded = true; Layout2(); } }
 
         protected override void OnShown(EventArgs e) { base.OnShown(e); (no ?? yes).Focus(); }   // for Yes/No the safe answer is the default
 
@@ -112,6 +139,27 @@ namespace WGuard
             TextRenderer.DrawText(g, glyph, Theme.IconBig, ir, fg, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
             Theme.Txt(g, title, Theme.H2, Theme.Text, MR(titleRect), Theme.Align.Start, false, true);
             if (text.Length > 0) Theme.Txt(g, text, Theme.Body, Theme.Muted, MR(textRect), Theme.Align.Start, false, true);
+            if (details.Length > 0)
+            {
+                // "Show details" with a chevron; the list opens under it
+                var tr = MR(toggleRect);
+                string t = expanded ? L.T("إخفاء التفاصيل", "Hide details") : L.T("عرض التفاصيل", "Show details");
+                string chev = expanded ? "" : "";
+                int cw = 18;
+                var chevR = L.Ar ? new Rectangle(tr.Right - cw, tr.Y, cw, tr.Height) : new Rectangle(tr.X, tr.Y, cw, tr.Height);
+                var txtR = L.Ar ? new Rectangle(tr.X, tr.Y, tr.Width - cw - 4, tr.Height) : new Rectangle(tr.X + cw + 4, tr.Y, tr.Width - cw - 4, tr.Height);
+                TextRenderer.DrawText(g, chev, Theme.IconSmall, chevR, Theme.Link, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+                using (var f = new Font(Theme.Bold, hoverToggle ? FontStyle.Underline : FontStyle.Regular))
+                    Theme.Txt(g, t, f, Theme.Link, txtR, Theme.Align.Start);
+                if (expanded)
+                {
+                    var dr = MR(detailsRect);
+                    Theme.FillRound(g, Theme.Bg, dr, 10);
+                    Theme.StrokeRound(g, Theme.Border, dr, 10);
+                    var inner = new Rectangle(dr.X + 12, dr.Y + 10, dr.Width - 24, dr.Height - 20);
+                    Theme.Txt(g, details, Theme.Small, Theme.Text, inner, Theme.Align.Start, false, true);
+                }
+            }
         }
 
         protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
