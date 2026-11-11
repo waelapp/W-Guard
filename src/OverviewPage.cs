@@ -35,7 +35,9 @@ namespace WGuard
             scan.Click += (s, e) => main.RunScan(Scanners.Overview);
             var rep = new FlatButton(L.T("حفظ تقرير", "Save report"), FlatButton.Kind.Secondary, Glyph.Save);
             rep.Click += (s, e) => Report.Export(this);
-            actions = new Control[] { rep, scan };
+            var look = new FlatButton(Theme.Dark ? L.T("الوضع الفاتح", "Light mode") : L.T("الوضع الداكن", "Dark mode"), FlatButton.Kind.Secondary, Theme.Dark ? "\uE706" : "\uE708");
+            look.Click += (s, e) => main.SetDark(!Theme.Dark);
+            actions = new Control[] { look, rep, scan };
             Resize += (s, e) => canvas.Relayout();
             SizeChanged += (s, e) => { if (IsHandleCreated) BeginInvoke((Action)canvas.Relayout); };
         }
@@ -140,7 +142,7 @@ namespace WGuard
 
             void Card(Graphics g, Rectangle r)
             {
-                Theme.FillRound(g, Color.White, r, 14);
+                Theme.FillRound(g, Theme.Card, r, 14);
                 Theme.StrokeRound(g, Theme.Border, r, 14);
             }
 
