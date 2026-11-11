@@ -76,6 +76,7 @@ namespace WGuard
         public static int OldDays = 548;
         public static int BigMB = 500;
         public static int OldMinMB = 50;
+        public static int RescanDays = 7;
         public static string SkipVersion = "";
         public static Dictionary<string, string> DeskNames = new Dictionary<string, string>();
 
@@ -99,6 +100,7 @@ namespace WGuard
                         else if (k == "oldDays" && int.TryParse(v, out n)) OldDays = Math.Max(30, n);
                         else if (k == "bigMB" && int.TryParse(v, out n)) BigMB = Math.Max(50, n);
                         else if (k == "oldMinMB" && int.TryParse(v, out n)) OldMinMB = Math.Max(1, n);
+                        else if (k == "rescanDays" && int.TryParse(v, out n)) RescanDays = Math.Max(1, Math.Min(365, n));
                         else if (k == "skipVersion") SkipVersion = v;
                         else if (k.StartsWith("desk.") && v.Length > 0) DeskNames[k.Substring(5)] = v;
                     }
@@ -122,6 +124,7 @@ namespace WGuard
                 sb.AppendLine("oldDays=" + OldDays);
                 sb.AppendLine("bigMB=" + BigMB);
                 sb.AppendLine("oldMinMB=" + OldMinMB);
+                sb.AppendLine("rescanDays=" + RescanDays);
                 sb.AppendLine("skipVersion=" + SkipVersion);
                 foreach (var kv in DeskNames) sb.AppendLine("desk." + kv.Key + "=" + kv.Value);
                 File.WriteAllText(FilePath, sb.ToString(), new UTF8Encoding(false));
