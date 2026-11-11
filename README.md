@@ -134,6 +134,10 @@
 **رتبت سطح المكتب ولم يعجبني؟**
 من «ترتيب سطح المكتب» اضغط «تراجع عن الترتيب» ويعود كل عنصر لمكانه.
 
+## الملاحظات
+
+واجهت مشكلة أو عندك فكرة؟ [بلّغ عن مشكلة](https://github.com/waelapp/W-Guard/issues/new?template=1-quick.yml) · [اقترح فكرة](https://github.com/waelapp/W-Guard/issues/new?template=3-idea.yml) — وإذا أعجبك البرنامج ادعمه بنجمة ⭐ في أعلى الصفحة.
+
 ## الترخيص
 
 الكود مرخّص بـ **GNU GPL v3.0**. اسم **W-Guard** والشعار ليسا جزءاً من الترخيص — راجع [TRADEMARK.md](TRADEMARK.md). للإبلاغ عن ثغرة أمنية راجع [SECURITY.md](SECURITY.md).
@@ -152,6 +156,6 @@
 - No ads, no telemetry. The only network access is a version check against `api.github.com`, which can be turned off.
 - Arabic and English interface.
 
-**Download:** [Releases](https://github.com/waelapp/W-Guard/releases/latest) · **License:** GPL-3.0 (the W-Guard name and logo are not covered — see [TRADEMARK.md](TRADEMARK.md))
+**Download:** [Releases](https://github.com/waelapp/W-Guard/releases/latest) · **Feedback:** [Issues](https://github.com/waelapp/W-Guard/issues/new/choose) · **License:** GPL-3.0 (the W-Guard name and logo are not covered — see [TRADEMARK.md](TRADEMARK.md))
 
 <p align="center">© 2026 <b>WAEL</b> · <a href="https://github.com/waelapp">github.com/waelapp</a></p>
