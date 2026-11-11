@@ -47,7 +47,9 @@ namespace WGuard
             {
                 string pc = Demo.PcName;
                 if (Store.LastFullScan == DateTime.MinValue) return pc + "  ·  " + L.T("لم يُجرَ فحص شامل بعد", "No full scan yet");
-                return pc + "  ·  " + L.T("آخر فحص شامل: ", "Last full scan: ") + Store.LastFullScan.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+                int d = Store.DaysSinceFull;
+                string ago = d <= 0 ? L.T("اليوم", "today") : d == 1 ? L.T("أمس", "yesterday") : L.T("منذ " + d + " " + (d <= 10 ? "أيام" : "يوماً"), d + " days ago");
+                return pc + "  ·  " + L.T("آخر فحص شامل: ", "Last full scan: ") + Store.LastFullScan.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " (" + ago + ")";
             }
         }
         public Control[] HeaderActions { get { return actions; } }
@@ -193,6 +195,24 @@ namespace WGuard
                         hot.Add(new KeyValuePair<Rectangle, string>(M(fb), "scan"));
                     }
                     y += 92 + GapW;
+                }
+                else if (Store.ScanIsOld)
+                {
+                    // the saved results are getting old: suggest a fresh scan without forcing it
+                    var ob = new Rectangle(Pad, y, inner, 64);
+                    if (paint)
+                    {
+                        Theme.FillRound(g, Theme.WarnBg, M(ob), 12);
+                        TextRenderer.DrawText(g, Glyph.Search, Theme.Icon, M(new Rectangle(ob.X + 16, ob.Y, 24, ob.Height)), Theme.Warn, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                        int d = Store.DaysSinceFull;
+                        Theme.Txt(g, L.T("مرّ " + d + " " + (d <= 10 ? "أيام" : "يوماً") + " على آخر فحص شامل - ننصح بفحص جديد لتحديث النتائج", d + " days since the last full scan - a new scan is recommended to refresh the results"),
+                            Theme.Bold, Theme.Warn, M(new Rectangle(ob.X + 48, ob.Y, ob.Width - 230, ob.Height)), Theme.Align.Start, true, true);
+                        var bb = M(new Rectangle(ob.Right - 170, ob.Y + 13, 156, 38));
+                        Theme.FillRound(g, Theme.Primary, bb, 10);
+                        Theme.Txt(g, L.T("افحص الآن", "Scan now"), Theme.Bold, Color.White, bb, Theme.Align.Center);
+                        hot.Add(new KeyValuePair<Rectangle, string>(M(ob), "scan"));
+                    }
+                    y += 64 + GapW;
                 }
 
                 // ---- row 1: health / freeable / protection
