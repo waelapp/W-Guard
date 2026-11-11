@@ -414,7 +414,7 @@ namespace WGuard
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Log.Write("fatal: " + e.ExceptionObject);
                 Settings.Load();
                 L.Ar = Settings.Lang == "ar";
-                Theme.Apply(Settings.DarkMode);
+                Theme.Apply(Settings.DarkMode || Demo.ForceDark);
                 Updater.CleanupOld();
                 Log.Write("===== W-Guard " + AppInfo.VersionText + " started (" + Settings.Lang + ")");
                 Application.Run(new MainForm());
