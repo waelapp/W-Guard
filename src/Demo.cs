@@ -155,9 +155,10 @@ namespace WGuard
                 s.ForceClose();
             }
             var msgs = new[] {
-                new MsgForm(L.T("تم تنفيذ العملية على 3 عناصر.", "Completed on 3 items."), "", false, MsgForm.Kind.Success),
-                new MsgForm(L.T("نجح: 1   ·   لم ينجح: 1\n\nWeb Companion: لم تكتمل الإزالة - رُبما أُلغيت أو فشلت أداة الإزالة.", "Succeeded: 1   ·   Failed: 1\n\nWeb Companion: removal was not completed."), L.T("لم تكتمل بعض العمليات", "Some actions did not finish"), false, MsgForm.Kind.Warning),
-                new MsgForm(L.T("سيُعاد تشغيل البرنامج لتطبيق المظهر الجديد. متابعة؟", "W-Guard will restart to apply the new look. Continue?"), "", true, MsgForm.Kind.Question) };
+                new MsgForm(L.T("تم تنفيذ العملية على 3 عناصر.", "Completed on 3 items."), "", false, MsgForm.Kind.Success, null),
+                new MsgForm(L.T("نجح: 1   ·   لم ينجح: 1", "Succeeded: 1   ·   Failed: 1"), L.T("لم تكتمل بعض العمليات", "Some actions did not finish"), false, MsgForm.Kind.Warning, "Web Companion: " + L.T("لم تكتمل الإزالة - أُلغيت أداة الإزالة.", "removal was not completed.")),
+                new MsgForm(L.T("سيُعاد تشغيل البرنامج لتطبيق المظهر الجديد. متابعة؟", "W-Guard will restart to apply the new look. Continue?"), "", true, MsgForm.Kind.Question, null) };
+            msgs[1].ExpandDetails();
             string[] names = { "msg-success", "msg-failed", "msg-question" };
             for (int k = 0; k < msgs.Length; k++)
                 using (var m = msgs[k])
