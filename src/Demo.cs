@@ -15,6 +15,8 @@ namespace WGuard
         public static bool On;
         public static bool Shots;   // demo.flag = "shots": save lossless PNG screenshots of every page, then quit
 
+        public static bool ForceDark;   // "on-dark" / "shots-dark": demo in the dark look
+
         public static void Detect(string[] args)
         {
             foreach (string a in args) if (a == "--demo") On = true;
@@ -22,6 +24,7 @@ namespace WGuard
             {
                 string flag = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "demo.flag");
                 string v = File.Exists(flag) ? File.ReadAllText(flag).Trim().ToLowerInvariant() : "";
+                if (v.EndsWith("-dark")) { ForceDark = true; v = v.Substring(0, v.Length - 5); }
                 if (v == "on") On = true;
                 if (v == "shots") { On = true; Shots = true; }
             }
