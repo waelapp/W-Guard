@@ -1,0 +1,23 @@
+name: "🐞 بلاغ سريع / Quick report"
+description: "دقيقة واحدة: اكتب المشكلة فقط"
+title: "[مشكلة] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: "وش المشكلة؟"
+      description: "اكتب باختصار ماذا حدث. ولا تكتب أي معلومات شخصية."
+      placeholder: "مثال: عند الضغط على «تنظيف» يتوقف البرنامج."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "إصدار W-Guard (اختياري)"
+      placeholder: "1.1"
+  - type: textarea
+    id: shot
+    attributes:
+      label: "صورة للشاشة (اختياري)"
+      description: "اسحب الصورة هنا."
