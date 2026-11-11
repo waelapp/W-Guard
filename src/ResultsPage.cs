@@ -195,6 +195,24 @@ namespace WGuard
             g.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
             g.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             g.ColumnHeadersHeight = 40;
+            // visible dividers between column headers, so it is clear where to drag to resize a column
+            g.CellPainting += (s, e) =>
+            {
+                if (e.RowIndex != -1 || e.ColumnIndex < 0) return;
+                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
+                var b = e.CellBounds;
+                using (var pen = new Pen(Theme.Hex("D5DBE5")))
+                {
+                    e.Graphics.DrawLine(pen, b.Left, b.Bottom - 1, b.Right, b.Bottom - 1);
+                    bool last = e.ColumnIndex == g.Columns.GetLastColumn(DataGridViewElementStates.Visible, DataGridViewElementStates.None).Index;
+                    if (!last && g.Columns[e.ColumnIndex].Resizable != DataGridViewTriState.False)
+                    {
+                        int x = g.RightToLeft == RightToLeft.Yes ? b.Left : b.Right - 1;
+                        using (var dp = new Pen(Theme.Hex("B8C1CE"), 1.5f)) e.Graphics.DrawLine(dp, x, b.Top + 9, x, b.Bottom - 10);
+                    }
+                }
+                e.Handled = true;
+            };
             g.RowTemplate.Height = 38;
             g.ColumnHeadersDefaultCellStyle.BackColor = Theme.Hex("F7F8FB");
             g.ColumnHeadersDefaultCellStyle.ForeColor = Theme.Muted;
