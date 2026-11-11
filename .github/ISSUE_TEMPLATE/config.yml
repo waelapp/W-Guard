@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🌐 موقع W-Guard"
+    url: https://waelapp.github.io/W-Guard/
+    about: "الأسئلة الشائعة وطريقة الاستخدام"
+  - name: "🔒 ثغرة أمنية"
+    url: https://github.com/waelapp/W-Guard/security/policy
+    about: "لا تنشر الثغرات الأمنية علناً، اتبع سياسة الأمان"
