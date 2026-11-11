@@ -585,6 +585,7 @@ namespace WGuard
     static class Native
     {
         [DllImport("user32.dll")] public static extern bool ReleaseCapture();
+        [DllImport("user32.dll")] public static extern bool AllowSetForegroundWindow(int pid);
         [DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, IntPtr l);
 
         [StructLayout(LayoutKind.Sequential)]
