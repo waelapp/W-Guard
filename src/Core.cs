@@ -78,6 +78,7 @@ namespace WGuard
         public static int OldMinMB = 50;
         public static int RescanDays = 7;
         public static string SkipVersion = "";
+        public static bool DarkMode;
         public static Dictionary<string, string> DeskNames = new Dictionary<string, string>();
 
         static string FilePath { get { return Path.Combine(AppInfo.DataDir, "settings.ini"); } }
@@ -101,6 +102,7 @@ namespace WGuard
                         else if (k == "bigMB" && int.TryParse(v, out n)) BigMB = Math.Max(50, n);
                         else if (k == "oldMinMB" && int.TryParse(v, out n)) OldMinMB = Math.Max(1, n);
                         else if (k == "rescanDays" && int.TryParse(v, out n)) RescanDays = Math.Max(1, Math.Min(365, n));
+                        else if (k == "dark") DarkMode = v == "1";
                         else if (k == "skipVersion") SkipVersion = v;
                         else if (k.StartsWith("desk.") && v.Length > 0) DeskNames[k.Substring(5)] = v;
                     }
@@ -125,6 +127,7 @@ namespace WGuard
                 sb.AppendLine("bigMB=" + BigMB);
                 sb.AppendLine("oldMinMB=" + OldMinMB);
                 sb.AppendLine("rescanDays=" + RescanDays);
+                sb.AppendLine("dark=" + (DarkMode ? "1" : "0"));
                 sb.AppendLine("skipVersion=" + SkipVersion);
                 foreach (var kv in DeskNames) sb.AppendLine("desk." + kv.Key + "=" + kv.Value);
                 File.WriteAllText(FilePath, sb.ToString(), new UTF8Encoding(false));
@@ -155,29 +158,81 @@ namespace WGuard
         {
             return Color.FromArgb(Convert.ToInt32(h.Substring(0, 2), 16), Convert.ToInt32(h.Substring(2, 2), 16), Convert.ToInt32(h.Substring(4, 2), 16));
         }
-        public static readonly Color Navy = Hex("111827");
-        public static readonly Color Navy2 = Hex("1C2536");
-        public static readonly Color NavyLine = Hex("263043");
-        public static readonly Color NavText = Hex("C9D1DE");
-        public static readonly Color Teal = Hex("00D6A0");
-        public static readonly Color Primary = Hex("08876A");
-        public static readonly Color PrimaryHover = Hex("066F57");
-        public static readonly Color TealTint = Hex("E3F8F1");
-        public static readonly Color Bg = Hex("F3F5F8");
-        public static readonly Color Card = Color.White;
-        public static readonly Color Border = Hex("E3E7EE");
-        public static readonly Color Track = Hex("E6EAF0");
-        public static readonly Color Text = Hex("111827");
-        public static readonly Color Muted = Hex("5B6577");
-        public static readonly Color Faint = Hex("8892A4");
-        public static readonly Color WarnBg = Hex("FFF4E5");
-        public static readonly Color Warn = Hex("8A4B00");
-        public static readonly Color WarnDot = Hex("E8930C");
-        public static readonly Color Danger = Hex("D9342B");
-        public static readonly Color DangerHover = Hex("B9281F");
-        public static readonly Color DangerBg = Hex("FDECEB");
-        public static readonly Color Ok = Hex("1F9D6B");
-        public static readonly Color OkBg = Hex("E7F6EF");
+        public static Color Navy = Hex("111827");
+        public static Color Navy2 = Hex("1C2536");
+        public static Color NavyLine = Hex("263043");
+        public static Color NavText = Hex("C9D1DE");
+        public static Color Teal = Hex("00D6A0");
+        public static Color Primary = Hex("08876A");
+        public static Color PrimaryHover = Hex("066F57");
+        public static Color TealTint = Hex("E3F8F1");
+        public static Color Bg = Hex("F3F5F8");
+        public static Color Card = Color.White;
+        public static Color Border = Hex("E3E7EE");
+        public static Color Track = Hex("E6EAF0");
+        public static Color Text = Hex("111827");
+        public static Color Muted = Hex("5B6577");
+        public static Color Faint = Hex("8892A4");
+        public static Color WarnBg = Hex("FFF4E5");
+        public static Color Warn = Hex("8A4B00");
+        public static Color WarnDot = Hex("E8930C");
+        public static Color Danger = Hex("D9342B");
+        public static Color DangerHover = Hex("B9281F");
+        public static Color DangerBg = Hex("FDECEB");
+        public static Color Ok = Hex("1F9D6B");
+        public static Color OkBg = Hex("E7F6EF");
+
+        // extra surfaces (tables, notes, inputs)
+        public static Color HeaderBg = Hex("F7F8FB");
+        public static Color GridLine = Hex("D5DBE5");
+        public static Color GridDivider = Hex("B8C1CE");
+        public static Color NoteText = Hex("1F4D36");
+        public static Color Input = Color.White;
+        public static Color Link = Hex("08876A");
+        public static bool Dark;
+
+        // dark palette: same layout and brand colors, darker surfaces and lighter text
+        public static void Apply(bool dark)
+        {
+            Dark = dark;
+            if (!dark) return;
+            Navy = Hex("0A0F19"); Navy2 = Hex("1C2536"); NavyLine = Hex("182132");
+            TealTint = Hex("11352C");
+            Bg = Hex("0E1420"); Card = Hex("171F2E"); Border = Hex("263043"); Track = Hex("263043");
+            Text = Hex("E8ECF2"); Muted = Hex("9AA4B5"); Faint = Hex("6F7A8C");
+            WarnBg = Hex("3A2A12"); Warn = Hex("F5B35C");
+            DangerBg = Hex("3A1D20");
+            Ok = Hex("2BD99A"); OkBg = Hex("12362B");
+            HeaderBg = Hex("1C2536"); GridLine = Hex("2E3A50"); GridDivider = Hex("4A5870");
+            NoteText = Hex("BFEBDD"); Input = Hex("1F2838"); Link = Hex("2BD99A");
+        }
+
+        [DllImport("dwmapi.dll")] static extern int DwmSetWindowAttribute(IntPtr h, int attr, ref int val, int size);
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)] static extern int SetWindowTheme(IntPtr h, string app, string idList);
+
+        // gives standard Windows controls (text boxes, lists, check boxes, scroll bars, title bar) the current palette
+        static readonly HashSet<Control> styled = new HashSet<Control>();
+        public static void Style(Control c)
+        {
+            if (!Dark || c == null || !styled.Add(c)) return;
+            c.Disposed += (s, e) => styled.Remove(c);
+            var f = c as Form;
+            if (f != null)
+            {
+                f.HandleCreated += (s, e) => { int on = 1; try { DwmSetWindowAttribute(f.Handle, 20, ref on, 4); } catch { } };
+                if (f.IsHandleCreated) { int on = 1; try { DwmSetWindowAttribute(f.Handle, 20, ref on, 4); } catch { } }
+            }
+            if (c is TextBox || c is NumericUpDown || c is ComboBox) { c.BackColor = Input; c.ForeColor = Text; var cb = c as ComboBox; if (cb != null) cb.FlatStyle = FlatStyle.Flat; }
+            else if (c.ForeColor == SystemColors.ControlText) c.ForeColor = Text;
+            var dg = c as DataGridView;
+            if (dg != null || c is TextBox || (c is ScrollableControl && ((ScrollableControl)c).AutoScroll))
+            {
+                c.HandleCreated += (s, e) => { try { SetWindowTheme(c.Handle, "DarkMode_Explorer", null); } catch { } };
+                if (c.IsHandleCreated) try { SetWindowTheme(c.Handle, "DarkMode_Explorer", null); } catch { }
+            }
+            foreach (Control k in c.Controls) Style(k);
+            c.ControlAdded += (s, e) => Style(e.Control);
+        }
 
         public static readonly Font Body = new Font("Segoe UI", 10f);
         public static readonly Font Small = new Font("Segoe UI", 9f);
