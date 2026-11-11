@@ -262,6 +262,8 @@ namespace WGuard
     {
         readonly MainForm main;
         Rectangle linkRect, ghRect;
+        Rectangle[] fbRects = new Rectangle[0];
+        static readonly string Repo = "https://github.com/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName;
 
         public AboutPage(MainForm owner)
         {
@@ -289,7 +291,7 @@ namespace WGuard
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
             int W = Width;
-            var card = new Rectangle(28, 0, Math.Min(W - 56, 860), 470);
+            var card = new Rectangle(28, 0, Math.Min(W - 56, 860), 556);
             card = Theme.M(card, W);
             Theme.FillRound(g, Color.White, card, 14);
             Theme.StrokeRound(g, Theme.Border, card, 14);
@@ -311,7 +313,7 @@ namespace WGuard
                 L.T("الحذف إلى سلة المحذوفات افتراضياً، ويرفض البرنامج لمس ملفات ويندوز والمجلدات الحساسة.", "Deletes go to the Recycle Bin by default; Windows files and sensitive folders are refused."),
                 L.T("كل عملية تُسجَّل، ومدخلات السجل (Registry) تُنسخ احتياطياً قبل حذفها.", "Every action is logged; registry values are backed up before removal."),
                 L.T("الاتصال الوحيد بالإنترنت هو التحقق من التحديثات على GitHub، ولا يُرسل أي بيانات عن جهازك.", "The only network use is the GitHub update check; no data about your PC is sent."),
-                L.T("مفتوح المصدر بالكامل على GitHub - لا شيفرة مخفية، ويمكنك فحصه على VirusTotal في أي وقت.", "Fully open source on GitHub - no hidden code; check it on VirusTotal anytime.") };
+                L.T("مفتوح المصدر بالكامل على GitHub - لا شيفرة مخفية.", "Fully open source on GitHub - no hidden code.") };
             foreach (string s in items)
             {
                 TextRenderer.DrawText(g, Glyph.Check, Theme.Icon, M(new Rectangle(x, y, 22, 26)), Theme.Primary, TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter);
@@ -321,13 +323,40 @@ namespace WGuard
             y += 10;
             ghRect = M(new Rectangle(x, y, 300, 22));
             TextRenderer.DrawText(g, "github.com/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName, Theme.Body, ghRect, Theme.Primary, TextFormatFlags.VerticalCenter | (L.Ar ? TextFormatFlags.Right : TextFormatFlags.Left));
+
+            // feedback
+            y += 40;
+            Theme.Txt(g, L.T("رأيك يهمنا", "Your feedback matters"), Theme.H2, Theme.Text, M(new Rectangle(x, y, tw + 120, 26)), Theme.Align.Start);
+            y += 34;
+            string[] labels = { L.T("بلّغ عن مشكلة", "Report a problem"), L.T("اقترح فكرة", "Suggest an idea"), L.T("ادعمنا بنجمة على GitHub", "Star us on GitHub") };
+            fbRects = new Rectangle[labels.Length];
+            int bx = x;
+            for (int k = 0; k < labels.Length; k++)
+            {
+                int bw = TextRenderer.MeasureText(labels[k], Theme.Bold).Width + 36;
+                var r = M(new Rectangle(bx, y, bw, 38));
+                fbRects[k] = r;
+                if (k == 0) Theme.FillRound(g, Theme.Primary, r, 9);
+                else { Theme.FillRound(g, Color.White, r, 9); Theme.StrokeRound(g, Theme.Border, r, 9); }
+                Theme.Txt(g, labels[k], Theme.Bold, k == 0 ? Color.White : Theme.Text, r, Theme.Align.Center);
+                bx += bw + 10;
+            }
         }
 
-        protected override void OnMouseMove(MouseEventArgs e) { Cursor = (linkRect.Contains(e.Location) || ghRect.Contains(e.Location)) ? Cursors.Hand : Cursors.Default; base.OnMouseMove(e); }
+        string FeedbackUrl(int k)
+        {
+            if (k == 0) return Repo + "/issues/new?template=1-quick.yml&version=" + AppInfo.VersionText;
+            if (k == 1) return Repo + "/issues/new?template=3-idea.yml";
+            return Repo;
+        }
+        int FeedbackAt(Point p) { for (int k = 0; k < fbRects.Length; k++) if (fbRects[k].Contains(p)) return k; return -1; }
+
+        protected override void OnMouseMove(MouseEventArgs e) { Cursor = (linkRect.Contains(e.Location) || ghRect.Contains(e.Location) || FeedbackAt(e.Location) >= 0) ? Cursors.Hand : Cursors.Default; base.OnMouseMove(e); }
         protected override void OnMouseClick(MouseEventArgs e)
         {
             if (linkRect.Contains(e.Location)) U.Open(AppInfo.Link);
-            else if (ghRect.Contains(e.Location)) U.Open("https://github.com/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName + "/releases");
+            else if (ghRect.Contains(e.Location)) U.Open(Repo + "/releases");
+            else if (FeedbackAt(e.Location) >= 0) U.Open(FeedbackUrl(FeedbackAt(e.Location)));
             base.OnMouseClick(e);
         }
     }
