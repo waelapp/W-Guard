@@ -176,9 +176,44 @@ namespace WGuard
             if (cmd.IndexOf("msiexec", StringComparison.OrdinalIgnoreCase) >= 0)
                 cmd = System.Text.RegularExpressions.Regex.Replace(cmd, @"(?i)/I\s*\{", "/X{");
             Log.Write("uninstall: " + r.Name + " | " + cmd);
+            DateTime started = DateTime.Now;
             var psi = new ProcessStartInfo("cmd.exe", "/c \"" + cmd + "\"") { UseShellExecute = false, CreateNoWindow = true };
             using (var p = Process.Start(psi)) { p.WaitForExit(); }
-            return L.T("انتهت أداة الإزالة", "Uninstaller finished");
+            // many uninstallers (Inno Setup, NSIS) hand over to a copy of themselves and return at once,
+            // so wait while one is still running, then check that the program really left the list
+            DateTime limit = DateTime.Now.AddMinutes(15), grace = DateTime.Now.AddSeconds(20);
+            while (DateTime.Now < limit && StillInstalled(r) && (DateTime.Now < grace || UninstallerRunning(started))) System.Threading.Thread.Sleep(1000);
+            if (StillInstalled(r))
+                throw new Exception(L.T("لم تكتمل الإزالة - رُبما أُلغيت أو فشلت أداة الإزالة. أعد المحاولة وأكمل خطواتها حتى النهاية.",
+                    "Removal was not completed - the uninstaller was cancelled or failed. Try again and follow it to the end."));
+            return L.T("أُزيل", "Removed");
+        }
+
+        static bool StillInstalled(Row r)
+        {
+            try
+            {
+                string sub;
+                using (var bk = OpenUninstallKey(r, false, out sub))
+                using (var k = bk.OpenSubKey(sub)) return k != null;
+            }
+            catch { return false; }
+        }
+
+        static bool UninstallerRunning(DateTime since)
+        {
+            foreach (var p in Process.GetProcesses())
+            {
+                try
+                {
+                    string n = p.ProcessName.ToLowerInvariant();
+                    bool like = n.StartsWith("unins") || n.StartsWith("_iu") || n.StartsWith("au_") || n.StartsWith("un_a") || n.Contains("uninst") || n == "msiexec";
+                    if (like && p.StartTime >= since.AddSeconds(-5)) return true;
+                }
+                catch { }
+                finally { p.Dispose(); }
+            }
+            return false;
         }
 
         static string RemoveUninstallEntry(Row r)
