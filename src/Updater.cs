@@ -64,9 +64,10 @@ namespace WGuard
             info.Tag = Uri.UnescapeDataString(t.Groups[1].Value);
             info.Page = repo + "/releases/tag/" + t.Groups[1].Value;
             info.Notes = L.T("التفاصيل في صفحة الإصدار.", "See the release page for details.");
-            string dl = repo + "/releases/download/" + t.Groups[1].Value + "/";
-            info.ExeUrl = dl + "W-Guard.exe"; info.ShaUrl = dl + "W-Guard.exe.sha256";
-            info.SetupUrl = dl + "W-Guard-Setup.exe"; info.SetupShaUrl = dl + "W-Guard-Setup.exe.sha256";
+            // release files carry the version in their names: W-Guard-Setup-1.4.exe, W-Guard-1.4.exe
+            string dl = repo + "/releases/download/" + t.Groups[1].Value + "/", ver = info.Tag.TrimStart('v', 'V');
+            info.ExeUrl = dl + "W-Guard-" + ver + ".exe"; info.ShaUrl = info.ExeUrl + ".sha256";
+            info.SetupUrl = dl + "W-Guard-Setup-" + ver + ".exe"; info.SetupShaUrl = info.SetupUrl + ".sha256";
             Match m = Regex.Match(info.Tag, @"(\d+)\.(\d+)(\.(\d+))?");
             info.Version = m.Success ? new Version(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), m.Groups[4].Success ? int.Parse(m.Groups[4].Value) : 0) : new Version(0, 0);
             return info;
