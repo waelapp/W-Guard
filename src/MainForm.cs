@@ -137,6 +137,16 @@ namespace WGuard
             base.OnFormClosing(e);
         }
 
+        // switching the look restarts W-Guard so every page and window is drawn with the new palette
+        public void SetDark(bool dark)
+        {
+            Settings.DarkMode = dark; Settings.Save();
+            if (Msg.Show(this, L.T("سيُعاد تشغيل البرنامج لتطبيق المظهر الجديد. متابعة؟", "W-Guard will restart to apply the new look. Continue?"), AppInfo.Name, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            { Store.SaveCache(); Restart(); }
+        }
+
+        protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
+
         public void SetBusy(bool b)
         {
             UseWaitCursor = b;
@@ -184,7 +194,7 @@ namespace WGuard
             AutoScroll = true;
             Padding = new Padding(28, 0, 28, 20);
 
-            var t = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 2, BackColor = Color.White, Padding = new Padding(22, 16, 22, 16) };
+            var t = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 2, BackColor = Theme.Card, Padding = new Padding(22, 16, 22, 16) };
             t.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300));
             t.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             t.Paint += (s, e) => { using (var p = new Pen(Theme.Border)) e.Graphics.DrawRectangle(p, 0, 0, t.Width - 1, t.Height - 1); };
@@ -202,6 +212,13 @@ namespace WGuard
                     main.Restart();
             };
             AddRow(t, L.T("اللغة / Language", "Language / اللغة"), lang);
+
+            var look = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 200, Font = Theme.Body };
+            look.Items.Add(L.T("فاتح", "Light"));
+            look.Items.Add(L.T("داكن", "Dark"));
+            look.SelectedIndex = Settings.DarkMode ? 1 : 0;
+            look.SelectedIndexChanged += (s, e) => { bool d = look.SelectedIndex == 1; if (d != Settings.DarkMode) main.SetDark(d); };
+            AddRow(t, L.T("المظهر", "Appearance"), look);
 
             var upd = new CheckBox { Text = L.T("البحث عن تحديث عند كل تشغيل", "Check for updates at every start"), Checked = Settings.CheckUpdates, AutoSize = true, Font = Theme.Body };
             upd.CheckedChanged += (s, e) => { Settings.CheckUpdates = upd.Checked; Settings.Save(); };
@@ -306,7 +323,7 @@ namespace WGuard
             int W = Width;
             var card = new Rectangle(28, 0, Math.Min(W - 56, 860), 556);
             card = Theme.M(card, W);
-            Theme.FillRound(g, Color.White, card, 14);
+            Theme.FillRound(g, Theme.Card, card, 14);
             Theme.StrokeRound(g, Theme.Border, card, 14);
             Func<Rectangle, Rectangle> M = r => Theme.M(new Rectangle(r.X + (L.Ar ? 0 : 0), r.Y, r.Width, r.Height), W);
             int x = 28 + 30;
@@ -350,7 +367,7 @@ namespace WGuard
                 var r = M(new Rectangle(bx, y, bw, 38));
                 fbRects[k] = r;
                 if (k == 0) Theme.FillRound(g, Theme.Primary, r, 9);
-                else { Theme.FillRound(g, Color.White, r, 9); Theme.StrokeRound(g, Theme.Border, r, 9); }
+                else { Theme.FillRound(g, Theme.Card, r, 9); Theme.StrokeRound(g, Theme.Border, r, 9); }
                 Theme.Txt(g, labels[k], Theme.Bold, k == 0 ? Color.White : Theme.Text, r, Theme.Align.Center);
                 bx += bw + 10;
             }
@@ -397,6 +414,7 @@ namespace WGuard
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Log.Write("fatal: " + e.ExceptionObject);
                 Settings.Load();
                 L.Ar = Settings.Lang == "ar";
+                Theme.Apply(Settings.DarkMode);
                 Updater.CleanupOld();
                 Log.Write("===== W-Guard " + AppInfo.VersionText + " started (" + Settings.Lang + ")");
                 Application.Run(new MainForm());
