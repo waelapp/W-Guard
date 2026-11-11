@@ -191,6 +191,8 @@ namespace WGuard
     // ------------------------------------------------------------------ review window: folders to be created, renamable
     class OrganizeForm : Form
     {
+        protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
+
         public List<Row> Result = new List<Row>();
         public List<string> EmptyFolders = new List<string>();
         readonly List<Row> items;
@@ -206,7 +208,7 @@ namespace WGuard
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false; ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            BackColor = Color.White;
+            BackColor = Theme.Card;
             Font = Theme.Body;
             RightToLeft = L.Ar ? RightToLeft.Yes : RightToLeft.No;
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
@@ -227,7 +229,7 @@ namespace WGuard
             };
             Controls.Add(head); Controls.Add(sub);
 
-            var list = new Panel { Location = new Point(28, 108), Size = new Size(624, listH), AutoScroll = true, BackColor = Color.White };
+            var list = new Panel { Location = new Point(28, 108), Size = new Size(624, listH), AutoScroll = true, BackColor = Theme.Card };
             int y = 0;
             foreach (var c in groups)
             {
@@ -255,7 +257,7 @@ namespace WGuard
 
             int by = 108 + listH + 12;
             remember = new CheckBox { Text = L.T("احفظ هذه الأسماء للمرات القادمة", "Remember these names next time"), Checked = true, AutoSize = true, Location = new Point(28, by) };
-            var reset = new LinkLabel { Text = L.T("استعادة الأسماء الافتراضية", "Restore default names"), AutoSize = true, LinkColor = Theme.Primary, LinkBehavior = LinkBehavior.HoverUnderline, Location = new Point(400, by + 2) };
+            var reset = new LinkLabel { Text = L.T("استعادة الأسماء الافتراضية", "Restore default names"), AutoSize = true, LinkColor = Theme.Link, LinkBehavior = LinkBehavior.HoverUnderline, Location = new Point(400, by + 2) };
             reset.LinkClicked += (s, e) => { foreach (var kv in boxes) kv.Value.Text = Desk.Get(kv.Key).Default; };
             error = new Label { AutoSize = false, Size = new Size(624, 22), Location = new Point(28, by + 28), ForeColor = Theme.Danger, Font = Theme.Bold };
             Controls.Add(remember); Controls.Add(reset); Controls.Add(error);
