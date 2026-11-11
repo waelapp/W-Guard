@@ -150,14 +150,14 @@ namespace WGuard
                             if (n.Equals("desktop.ini", StringComparison.OrdinalIgnoreCase) || own.Contains(n)) continue;
                             if ((File.GetAttributes(p) & (FileAttributes.Hidden | FileAttributes.System)) != 0) continue;
                             bool isDir = Directory.Exists(p);
+                            // a numbered folder ("1- Work", "3- Projects") is the user's own organization: never touch or list it
+                            if (isDir && Regex.IsMatch(n, @"^\d+\s*-\s*\S")) continue;
                             if (ctx != null) ctx.Current = p;
                             string reason;
                             string id = Classify(p, isDir, out reason);
-                            bool already = isDir && Regex.IsMatch(n, @"^\d+\s*-\s*\S");
                             var row = new Row(n, "", 0, U.D(isDir ? Directory.GetLastWriteTime(p) : File.GetLastWriteTime(p)), p, "MoveDesk", id);
                             row.Risk = reason;
-                            row.Check = !already;
-                            if (already) { row.Risk = L.T("مجلد مرتّب مسبقاً (يبدأ برقم) - يبقى مكانه إلا إذا حددته", "Already an organized folder (numbered) - stays unless you tick it"); row.Level = 3; }
+                            row.Check = true;
                             SetTarget(row, id);
                             rows.Add(row);
                         }
