@@ -1,0 +1,62 @@
+name: "🔍 بلاغ مفصّل / Detailed bug report"
+description: "للمشاكل المعقدة: خطوات التكرار ونسخة ويندوز والسجل"
+title: "[مشكلة] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        شكراً لك على وقتك! كلما كان البلاغ أوضح، كان الإصلاح أسرع.
+        **لا تكتب أي معلومات شخصية** مثل كلمات المرور أو أسماء ملفات خاصة.
+  - type: textarea
+    id: what
+    attributes:
+      label: "وش المشكلة؟"
+      description: "اشرح باختصار ماذا حدث."
+      placeholder: "مثال: عند الضغط على «تنظيف» يتوقف البرنامج ولا يستجيب."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "خطوات تكرار المشكلة"
+      placeholder: |
+        1. افتح قسم «التنظيف»
+        2. حدّد «كاش المتصفحات»
+        3. اضغط «تنظيف المحدد»
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "وش كنت تتوقع يصير؟"
+  - type: dropdown
+    id: windows
+    attributes:
+      label: "نسخة ويندوز"
+      options:
+        - "Windows 11"
+        - "Windows 10"
+        - "غير ذلك"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "إصدار W-Guard"
+      description: "تجده في صفحة «عن البرنامج»."
+      placeholder: "1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: "نوع النسخة"
+      options:
+        - "ملف التثبيت (W-Guard-Setup.exe)"
+        - "النسخة المحمولة (W-Guard.exe)"
+  - type: textarea
+    id: shots
+    attributes:
+      label: "صور أو سجل (اختياري)"
+      description: 'اسحب صورة للشاشة هنا. السجل موجود في: %AppData%\W-Guard\logs'
