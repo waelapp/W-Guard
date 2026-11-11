@@ -1,0 +1,17 @@
+name: "💡 اقتراح فكرة / Feature request"
+description: "فكرة لتحسين W-Guard أو ميزة جديدة"
+title: "[اقتراح] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: "وش فكرتك؟"
+      placeholder: "مثال: إضافة جدولة للتنظيف التلقائي كل أسبوع."
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: "ليش تفيدك؟"
+      description: "وش المشكلة اللي تحلها هذه الفكرة؟"
