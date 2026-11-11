@@ -17,15 +17,104 @@ namespace WGuard
             Error = "", Undo = "", Save = "", Folder = "", Globe = "", Play = "", Stop = "";
     }
 
+    // themed message window (light or dark), with no system sound
     static class Msg
     {
         public static DialogResult Show(IWin32Window owner, string text, string title, MessageBoxButtons b, MessageBoxIcon i)
         {
-            MessageBoxOptions o = L.Ar ? (MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign) : (MessageBoxOptions)0;
-            MessageBoxDefaultButton def = b == MessageBoxButtons.YesNo ? MessageBoxDefaultButton.Button2 : MessageBoxDefaultButton.Button1;
-            return MessageBox.Show(owner, text, title, b, i, def, o);
+            using (var f = new MsgForm(text, title, b == MessageBoxButtons.YesNo, i == MessageBoxIcon.Error ? MsgForm.Kind.Error : i == MessageBoxIcon.Warning ? MsgForm.Kind.Warning : i == MessageBoxIcon.Question ? MsgForm.Kind.Question : MsgForm.Kind.Info))
+                return owner == null ? f.ShowDialog() : f.ShowDialog(owner);
         }
         public static void Info(IWin32Window owner, string text) { Show(owner, text, AppInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Information); }
+        public static void Success(IWin32Window owner, string text)
+        {
+            using (var f = new MsgForm(text, "", false, MsgForm.Kind.Success)) { if (owner == null) f.ShowDialog(); else f.ShowDialog(owner); }
+        }
+    }
+
+    class MsgForm : Form
+    {
+        public enum Kind { Info, Success, Warning, Error, Question }
+        readonly string title, text;
+        readonly Kind kind;
+        const int W = 460, Pad = 26;
+        Rectangle textRect, titleRect, iconRect;
+        FlatButton yes, no;
+
+        public MsgForm(string text, string title, bool yesNo, Kind kind)
+        {
+            this.text = text ?? ""; this.title = title ?? ""; this.kind = kind;
+            if (this.title == AppInfo.Name || this.title.Length == 0)
+                this.title = kind == Kind.Success ? L.T("تم بنجاح", "Done") : kind == Kind.Error ? L.T("حدث خطأ", "Something went wrong") : kind == Kind.Warning ? L.T("تنبيه", "Heads up") : kind == Kind.Question ? L.T("تأكيد", "Please confirm") : AppInfo.Name;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
+            FormBorderStyle = FormBorderStyle.None;
+            StartPosition = FormStartPosition.CenterParent;
+            ShowInTaskbar = false;
+            BackColor = Theme.Card;
+            Font = Theme.Body;
+            KeyPreview = true;
+            Text = AppInfo.Name;
+
+            int tx = Pad + 56, tw = W - tx - Pad;
+            int th = TextRenderer.MeasureText(this.title, Theme.H2, new Size(tw, 0), TextFormatFlags.WordBreak).Height;
+            int bh = this.text.Length == 0 ? 0 : TextRenderer.MeasureText(this.text, Theme.Body, new Size(tw, 0), TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix).Height;
+            titleRect = new Rectangle(tx, Pad + 2, tw, th);
+            textRect = new Rectangle(tx, titleRect.Bottom + 6, tw, bh);
+            iconRect = new Rectangle(Pad, Pad, 42, 42);
+            int by = Math.Max(iconRect.Bottom, textRect.Bottom) + 24;
+            ClientSize = new Size(W, by + 38 + Pad);
+
+            yes = new FlatButton(yesNo ? L.T("نعم، متابعة", "Yes, continue") : L.T("حسناً", "OK"), kind == Kind.Error ? FlatButton.Kind.Danger : FlatButton.Kind.Primary, "");
+            yes.Click += (s, e) => { DialogResult = yesNo ? DialogResult.Yes : DialogResult.OK; Close(); };
+            Controls.Add(yes);
+            int x = W - Pad;
+            yes.Location = new Point(x - yes.Width, by); x -= yes.Width + 10;
+            if (yesNo)
+            {
+                no = new FlatButton(L.T("لا", "No"), FlatButton.Kind.Secondary, "");
+                no.Click += (s, e) => { DialogResult = DialogResult.No; Close(); };
+                Controls.Add(no);
+                no.Location = new Point(x - no.Width, by);
+            }
+            if (L.Ar) foreach (Control c in Controls) c.Left = W - c.Right;
+            KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Escape) { DialogResult = yesNo ? DialogResult.No : DialogResult.OK; Close(); }
+                else if (e.KeyCode == Keys.Enter) { DialogResult = yesNo ? (ActiveControl == no ? DialogResult.No : DialogResult.Yes) : DialogResult.OK; Close(); }
+                else if (e.Control && e.KeyCode == Keys.C) { try { Clipboard.SetText(this.title + "\n" + this.text); } catch { } }
+            };
+            // a borderless window can still be dragged by its body
+            MouseDown += (s, e) => { if (e.Button == MouseButtons.Left) { Native.ReleaseCapture(); Native.SendMessage(Handle, 0xA1, (IntPtr)2, IntPtr.Zero); } };
+        }
+
+        protected override void OnShown(EventArgs e) { base.OnShown(e); (no ?? yes).Focus(); }   // for Yes/No the safe answer is the default
+
+        protected override CreateParams CreateParams { get { var cp = base.CreateParams; cp.ClassStyle |= 0x20000; return cp; } } // drop shadow
+
+        Rectangle MR(Rectangle r) { return Theme.M(r, ClientSize.Width); }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            using (var p = new Pen(Theme.Border)) g.DrawRectangle(p, 0, 0, ClientSize.Width - 1, ClientSize.Height - 1);
+            Color fg, bg; string glyph;
+            switch (kind)
+            {
+                case Kind.Success: fg = Theme.Ok; bg = Theme.OkBg; glyph = ""; break;
+                case Kind.Warning: fg = Theme.WarnDot; bg = Theme.WarnBg; glyph = ""; break;
+                case Kind.Error: fg = Theme.Danger; bg = Theme.DangerBg; glyph = ""; break;
+                case Kind.Question: fg = Theme.Primary; bg = Theme.TealTint; glyph = ""; break;
+                default: fg = Theme.Primary; bg = Theme.TealTint; glyph = ""; break;
+            }
+            var ir = MR(iconRect);
+            using (var b = new SolidBrush(bg)) g.FillEllipse(b, ir);
+            TextRenderer.DrawText(g, glyph, Theme.IconBig, ir, fg, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+            Theme.Txt(g, title, Theme.H2, Theme.Text, MR(titleRect), Theme.Align.Start, false, true);
+            if (text.Length > 0) Theme.Txt(g, text, Theme.Body, Theme.Muted, MR(textRect), Theme.Align.Start, false, true);
+        }
+
+        protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
     }
 
     class FlatButton : Control
