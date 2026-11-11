@@ -211,6 +211,7 @@ namespace WGuard
             var chk = new DataGridViewCheckBoxColumn { Name = "chk", HeaderText = "", Width = 44, AutoSizeMode = DataGridViewAutoSizeColumnMode.None, Resizable = DataGridViewTriState.False };
             g.Columns.Add(chk);
             AddText(g, "name", L.T("الاسم", "Name"), 24);
+            var plat = AddText(g, "platform", L.T("المنصة", "Platform"), 0); plat.Width = 110; plat.Visible = section == Scanners.Games;
             AddText(g, "detail", L.T("التفاصيل", "Details"), 34);
             var size = AddText(g, "size", L.T("الحجم", "Size"), 0); size.Width = 96;
             var date = AddText(g, "date", section == Scanners.Games || section == Scanners.Programs ? L.T("آخر تشغيل", "Last used") : L.T("التاريخ", "Date"), 0); date.Width = 112;
@@ -220,6 +221,7 @@ namespace WGuard
             if (section == Scanners.Cleanup || section == Scanners.Background) g.Columns["date"].Visible = false;
             if (section == Scanners.Cleanup) g.Columns["risk"].Visible = false;
             if (section == Scanners.Background) { g.Columns["size"].HeaderText = L.T("الذاكرة", "Memory"); g.Columns["risk"].HeaderText = L.T("النصيحة", "Advice"); g.Columns["risk"].FillWeight = 34; g.Columns["detail"].FillWeight = 26; }
+            if (section == Scanners.Games) g.Columns["detail"].HeaderText = L.T("مكتبة الألعاب", "Library");
             if (section == Scanners.Desktop) { g.Columns["detail"].HeaderText = L.T("المجلد", "Folder"); g.Columns["risk"].HeaderText = L.T("سبب التصنيف", "Why"); g.Columns["date"].Visible = false; }
 
             g.SortCompare += (s, e) =>
@@ -322,7 +324,9 @@ namespace WGuard
                 if (onlyRisk.Checked && (r.Level == 0 || r.Level == 3)) continue;
                 if (q.Length > 0 && r.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) < 0 && r.Path.IndexOf(q, StringComparison.OrdinalIgnoreCase) < 0 && r.Detail.IndexOf(q, StringComparison.OrdinalIgnoreCase) < 0) continue;
                 var gr = new DataGridViewRow();
-                gr.CreateCells(grid, r.Check && r.Action != "", r.Name, r.Detail, U.Size(r.Bytes), r.Date, r.Risk, r.Path);
+                string detail = r.Detail;
+                if (section == Scanners.Games) { int i = detail.IndexOf(" · "); if (i >= 0) detail = detail.Substring(i + 3); }
+                gr.CreateCells(grid, r.Check && r.Action != "", r.Name, Platform(r), detail, U.Size(r.Bytes), r.Date, r.Risk, r.Path);
                 gr.Tag = r;
                 if (r.Action == "") gr.Cells[0].ReadOnly = true;
                 list.Add(gr);
@@ -381,14 +385,34 @@ namespace WGuard
             var sb = new StringBuilder();
             sb.AppendLine(L.T("سيتم تنفيذ \"", "This will run \"") + actBtn.Text + L.T("\" على ", "\" on ") + sel.Count + L.T(" عنصر", " items") + (sel.Sum(x => x.Bytes) > 0 ? " (" + U.Size(sel.Sum(x => x.Bytes)) + ")" : "") + ":");
             sb.AppendLine();
-            foreach (var r in sel.Take(14)) sb.AppendLine("•  " + r.Name);
+            foreach (var r in sel.Take(14)) sb.AppendLine("•  " + r.Name + (section == Scanners.Games ? "  (" + Platform(r) + ")" : ""));
             if (sel.Count > 14) sb.AppendLine(L.T("... و", "... and ") + (sel.Count - 14) + L.T(" أخرى", " more"));
             if (recycle.Visible && !recycle.Checked) { sb.AppendLine(); sb.AppendLine(L.T("تنبيه: الحذف نهائي ولا يمكن استرجاعه.", "Warning: deletion is permanent and cannot be undone.")); }
+            if (section == Scanners.Games)
+            {
+                // games can only be removed by the platform that installed them
+                var plats = sel.Select(Platform).Where(x => x != "").Distinct().ToList();
+                sb.AppendLine();
+                sb.AppendLine(L.T("مهم: الإزالة تتم عن طريق المنصة نفسها، فيجب أن تكون ", "Important: removal is done by the platform itself, so ") + string.Join(L.T(" و ", " and "), plats) +
+                    L.T(" مثبّتة وتعمل ومسجّلاً دخولك فيها. ستفتح نافذة المنصة لتأكيد إزالة كل لعبة.", " must be installed, running and signed in. The platform's window will open to confirm each removal."));
+                if (plats.Contains("Xbox")) sb.AppendLine(L.T("ألعاب Xbox تُزال من «الإعدادات ← التطبيقات المثبتة».", "Xbox games are removed from Settings > Installed apps."));
+            }
             if (section == Scanners.Programs) { sb.AppendLine(); sb.AppendLine(L.T("ستظهر نافذة إزالة كل برنامج - أكملها حتى النهاية.", "Each program's uninstaller will open - follow it to the end.")); }
             sb.AppendLine();
             sb.Append(L.T("هل تريد المتابعة؟", "Do you want to continue?"));
             if (Msg.Show(this, sb.ToString(), L.T("تأكيد", "Confirm"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
             RunSelected(sel, rec);
+        }
+
+        static string Platform(Row r)
+        {
+            switch (r.Action)
+            {
+                case "SteamUninstall": return "Steam";
+                case "OpenEpic": return "Epic Games";
+                case "OpenXbox": return "Xbox";
+            }
+            return "";
         }
 
         void RunSelected(List<Row> sel, bool rec)
