@@ -115,8 +115,8 @@
 
 | الملف | لمن |
 |---|---|
-| [`W-Guard-Setup.exe`](https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard-Setup.exe) | ملف التثبيت — الأفضل لأغلب المستخدمين، يضيف اختصارات ويُزال من «التطبيقات المثبتة» |
-| [`W-Guard.exe`](https://github.com/waelapp/W-Guard/releases/latest/download/W-Guard.exe) | نسخة محمولة تعمل مباشرة بدون تثبيت |
+| [`W-Guard-Setup-<الإصدار>.exe`](https://github.com/waelapp/W-Guard/releases/latest) | ملف التثبيت — الأفضل لأغلب المستخدمين، يضيف اختصارات ويُزال من «التطبيقات المثبتة» |
+| [`W-Guard-<الإصدار>.exe`](https://github.com/waelapp/W-Guard/releases/latest) | نسخة محمولة تعمل مباشرة بدون تثبيت |
 
 **المتطلبات:** ويندوز 10 أو 11 (64-bit) · .NET Framework 4.8 (موجود في ويندوز) · صلاحيات المدير · أقل من 3 MB
 
