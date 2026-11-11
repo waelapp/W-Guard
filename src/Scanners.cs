@@ -57,6 +57,57 @@ namespace WGuard
         }
         public static void Remove(string section, Row r) { lock (Lock) { List<Row> l; if (Results.TryGetValue(section, out l)) l.Remove(r); } }
         public static long Total(string section) { var l = Get(section); return l == null ? 0 : l.Sum(x => x.Bytes); }
+        // ---- last full scan, kept between runs so the app does not ask for a new scan every time
+        // Background rows are not kept: they describe running processes, which change after a restart.
+        static string CacheFile { get { return Path.Combine(AppInfo.DataDir, "last-scan.json"); } }
+
+        public class Cache { public int V = 1; public string Time = ""; public Dictionary<string, List<Row>> Sections = new Dictionary<string, List<Row>>(); }
+
+        public static int DaysSinceFull { get { return LastFullScan == DateTime.MinValue ? -1 : (int)(DateTime.Now - LastFullScan).TotalDays; } }
+        public static bool ScanIsOld { get { return LastFullScan != DateTime.MinValue && DaysSinceFull >= Settings.RescanDays; } }
+
+        public static void SaveCache()
+        {
+            if (Demo.On || LastFullScan == DateTime.MinValue) return;
+            try
+            {
+                var c = new Cache { Time = LastFullScan.ToString("o", System.Globalization.CultureInfo.InvariantCulture) };
+                lock (Lock) foreach (var kv in Results) if (kv.Key != Scanners.Background) c.Sections[kv.Key] = new List<Row>(kv.Value);
+                foreach (var l in c.Sections.Values) foreach (var r in l) r.Check = false;
+                var js = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+                string tmp = CacheFile + ".tmp";
+                File.WriteAllText(tmp, js.Serialize(c), new System.Text.UTF8Encoding(false));
+                if (File.Exists(CacheFile)) File.Delete(CacheFile);
+                File.Move(tmp, CacheFile);
+            }
+            catch (Exception ex) { Log.Write("cache save: " + ex.Message); }
+        }
+
+        public static bool LoadCache()
+        {
+            if (Demo.On) return false;
+            try
+            {
+                if (!File.Exists(CacheFile)) return false;
+                var js = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+                var c = js.Deserialize<Cache>(File.ReadAllText(CacheFile, System.Text.Encoding.UTF8));
+                DateTime t;
+                if (c == null || c.Sections == null || !DateTime.TryParse(c.Time, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out t)) return false;
+                lock (Lock)
+                {
+                    foreach (var kv in c.Sections)
+                    {
+                        if (kv.Key == Scanners.Background || kv.Value == null) continue;
+                        foreach (var r in kv.Value) r.Section = kv.Key;
+                        Results[kv.Key] = kv.Value;
+                    }
+                }
+                LastFullScan = t;
+                return true;
+            }
+            catch (Exception ex) { Log.Write("cache load: " + ex.Message); return false; }
+        }
+
         public static int Count(string section, int minLevel)
         {
             var l = Get(section);
