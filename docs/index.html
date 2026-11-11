@@ -91,6 +91,16 @@ h1 span{color:var(--teal)}
 .cmp-wrap{overflow-x:auto}
 .cmp-note{max-width:980px;margin:10px auto 0;color:var(--faint);font-size:13.5px;text-align:start}
 
+/* feedback */
+.fb{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;max-width:980px;margin:0 auto;background:var(--tint);border:1px solid #C5EBDD;border-radius:var(--r);padding:20px 22px}
+.fb .ico{margin:0;background:#fff}
+.fb h3{margin:0 0 2px;font-size:19px}.fb p{margin:0;color:#2f5a46;font-size:15.5px}
+.fb-b{display:flex;gap:8px;flex-wrap:wrap}
+.fb .btn{padding:10px 16px;font-size:15px}
+.fb .btn.primary{background:var(--primary);color:#fff}
+.fb .btn.out{background:#fff;color:var(--primary);border-color:#C5EBDD}
+@media (max-width:900px){.fb{grid-template-columns:1fr}}
+
 /* sections */
 section{padding:84px 0}
 .kicker{color:var(--primary);font-weight:700;font-size:14px;letter-spacing:.4px}
@@ -475,6 +485,19 @@ footer .brand{font-size:17px}
   </div>
 </section>
 
+<section id="feedback" style="padding:56px 0 0">
+  <div class="wrap">
+    <div class="fb">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></div>
+      <div><h3 data-i="fb_h">رأيك يهمنا</h3><p data-i="fb_p">واجهت مشكلة أو عندك فكرة تحسّن البرنامج؟ اكتب لنا، وكل بلاغ نقرأه ونرد عليه.</p></div>
+      <div class="fb-b">
+        <a class="btn primary" href="https://github.com/waelapp/W-Guard/issues/new?template=1-quick.yml" target="_blank" rel="noopener" data-i="fb_1">بلّغ عن مشكلة</a>
+        <a class="btn out" href="https://github.com/waelapp/W-Guard/issues/new?template=3-idea.yml" target="_blank" rel="noopener" data-i="fb_2">اقترح فكرة</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="faq">
   <div class="wrap">
     <div class="center">
@@ -506,6 +529,7 @@ footer .brand{font-size:17px}
   <div class="wrap">
     <a class="brand" href="#top"><img src="img/logo.png" alt="" width="26" height="26">W-Guard</a>
     <span>© 2026 WAEL · <span data-i="ft_l">مفتوح المصدر بترخيص</span> <a href="https://github.com/waelapp/W-Guard/blob/main/LICENSE">GPL-3.0</a> · <a href="https://github.com/waelapp">github.com/waelapp</a></span>
+    <a href="https://github.com/waelapp/W-Guard/issues/new/choose" target="_blank" rel="noopener" data-i="ft_fb">أرسل ملاحظة</a>
     <a href="#policy" data-i="ft_cs">سياسة الخصوصية</a>
     <span data-i="ft_t">اسم W-Guard والشعار ملك لـ WAEL.</span>
   </div>
@@ -572,7 +596,8 @@ const EN = {
   q6:"Does it replace my antivirus?", a6:"No, W-Guard is not an antivirus. It relies on Microsoft Defender and complements it by spotting suspicious autostarts and unwanted programs.",
   q7:"How do I uninstall it?", a7:"Settings → Apps → Installed apps → W-Guard → Uninstall. For the portable version just delete the file.",
   pv_h:"Privacy policy", pv_p:"W-Guard sends no information about your PC. Its only connection is one request at start to api.github.com to read the latest version number, which you can turn off in Settings. Nothing else is transferred unless you explicitly ask for it.",
-  ft_cs:"Privacy policy",
+  ft_cs:"Privacy policy", ft_fb:"Send feedback",
+  fb_h:"Your feedback matters", fb_p:"Hit a problem or have an idea to make W-Guard better? Tell us — every report is read and answered.", fb_1:"Report a problem", fb_2:"Suggest an idea",
   nav_compare:"Compare", hl1:"How it works", hl2:"Compare", hl3:"Features", hl4:"Privacy", hl5:"Download",
   demo_tag:"sample data", ch1:"Overview", ch2:"Scan", ch3:"Security", ch4:"Background", ch5:"Space", ch6:"Desktop", ch7:"Cleanup",
   cm_k:"Compare", cm_h:"How is W-Guard different?", cm_s:"Compared with well-known Windows cleanup tools.", cm_cc:"CCleaner (free)", cm_dc:"Windows Disk Cleanup",
