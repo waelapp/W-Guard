@@ -35,6 +35,11 @@
   <sub>بيانات تجريبية — Sample data</sub>
 </p>
 
+<p align="center">
+  <a href="https://waelapp.github.io/W-Guard/#video"><img src="docs/video/video-play.jpg" width="640" alt="شاهد فيديو W-Guard — Watch the video"></a><br>
+  <sub>▶ شاهد الفيديو بالتعليق الصوتي (أقل من دقيقة) — <a href="docs/video/W-Guard-demo.mp4">تنزيل MP4</a></sub>
+</p>
+
 <div dir="rtl">
 
 ## لماذا W-Guard
