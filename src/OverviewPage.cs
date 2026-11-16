@@ -99,6 +99,18 @@ namespace WGuard
                 int st = bg.Count(r => r.Action == "DisableStartup");
                 if (st > 6) { score -= 4; alerts.Add(new Alert(1, st + L.T(" برنامج يقلع مع ويندوز - تعطيل غير الضروري يسرّع الإقلاع", " apps start with Windows - disabling extras speeds up boot"), Scanners.Background)); }
             }
+            if (Drivers.Scanned)
+            {
+                int dp = Drivers.ProblemCount, dg = Drivers.GenericCount;
+                if (dp > 0) { score -= Math.Min(12, dp * 4); alerts.Add(new Alert(2, dp + L.T(" جهاز بدون تعريف أو فيه مشكلة", " device(s) without a driver or with a problem"), "drivers")); }
+                if (dg > 0) alerts.Add(new Alert(0, dg + L.T(" جهاز يعمل بتعريف عام من ويندوز - ثبّت تعريف الشركة المصنّعة", " device(s) use a generic Windows driver - install the maker's driver"), "drivers"));
+            }
+            if (Drivers.Scanned)
+            {
+                int dp = Drivers.ProblemCount, dg = Drivers.GenericCount;
+                if (dp > 0) { score -= Math.Min(12, dp * 4); alerts.Add(new Alert(2, dp + L.T(" جهاز بدون تعريف أو فيه مشكلة", " device(s) without a driver or with a problem"), "drivers")); }
+                if (dg > 0) alerts.Add(new Alert(0, dg + L.T(" جهاز يعمل بتعريف عام من ويندوز - ثبّت تعريف الشركة المصنّعة", " device(s) use a generic Windows driver - install the maker's driver"), "drivers"));
+            }
             if (alerts.Count == 0) alerts.Add(new Alert(3, L.T("لا توجد مشاكل - جهازك بحالة ممتازة", "No issues - your PC is in great shape"), ""));
             return Math.Max(0, Math.Min(100, score));
         }

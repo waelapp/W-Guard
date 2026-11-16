@@ -41,6 +41,8 @@ namespace WGuard
             nav.Items.Add(new NavItem(Scanners.Background, Glyph.Pulse, L.T("الخلفية وبدء التشغيل", "Background & startup")));
             nav.Items.Add(new NavItem(Scanners.Cleanup, Glyph.Broom, L.T("التنظيف", "Cleanup")));
             nav.Items.Add(new NavItem(Scanners.Desktop, Glyph.Tiles, L.T("ترتيب سطح المكتب", "Desktop organizer")));
+            nav.Items.Add(new NavItem("apps", "", L.T("البرامج المهمة", "Essential apps")) { GapBefore = true });
+            nav.Items.Add(new NavItem("drivers", "", L.T("التعريفات", "Drivers")));
             nav.Items.Add(new NavItem("settings", Glyph.Settings, L.T("الإعدادات", "Settings")) { GapBefore = true });
             nav.Items.Add(new NavItem("about", Glyph.Info, L.T("عن البرنامج", "About")));
             nav.Navigate += Go;
@@ -57,6 +59,8 @@ namespace WGuard
             pages["overview"] = new OverviewPage(this);
             foreach (string s in new[] { Scanners.Space, Scanners.Old, Scanners.Games, Scanners.Programs, Scanners.Security, Scanners.Background, Scanners.Cleanup, Scanners.Desktop })
                 pages[s] = new ResultsPage(this, s);
+            pages["apps"] = new AppsPage(this);
+            pages["drivers"] = new DriversPage(this);
             pages["settings"] = new SettingsPage(this);
             pages["about"] = new AboutPage(this);
 
@@ -69,13 +73,15 @@ namespace WGuard
             // quick system read so the overview is filled right away (read-only)
             var th = new Thread(() =>
             {
-                if (Demo.On) { Demo.Load(); try { BeginInvoke((Action)RefreshAll); if (Demo.Shots) BeginInvoke((Action)(() => Demo.TakeShots(this))); } catch { } return; }
+                if (Demo.On) { Demo.Load(); Drivers.LoadDemo(); Winget.LoadDemo(); try { BeginInvoke((Action)RefreshAll); if (Demo.Shots) BeginInvoke((Action)(() => Demo.TakeShots(this))); } catch { } return; }
                 bool cached = Store.LoadCache();
                 if (cached) try { BeginInvoke((Action)RefreshAll); } catch { }
                 var info = SysInfo.Collect(null);
                 if (Store.Info == null) Store.Info = info;
                 // running programs change after every restart, so this list is always read fresh
                 if (cached) try { var bg = Scanners.ScanBackground(new ScanCtx()); Store.Reset(Scanners.Background); Store.Add(Scanners.Background, bg); } catch { }
+                // devices without a driver show up as a badge on "Drivers" (read-only WMI query)
+                try { Drivers.Scan(); } catch (Exception ex) { Log.Write("drivers: " + ex.Message); }
                 try { BeginInvoke((Action)RefreshAll); } catch { }
             });
             th.IsBackground = true;
@@ -162,6 +168,8 @@ namespace WGuard
                 if (it.Id == Scanners.Security) { int n = Store.Count(Scanners.Security, 2); if (n > 0) { it.Badge = n.ToString(); it.BadgeColor = Theme.Danger; } }
                 else if (it.Id == Scanners.Programs) { var l = Store.Get(Scanners.Programs); if (l != null) { int n = 0; foreach (var r in l) if (r.Level == 2) n++; if (n > 0) { it.Badge = n.ToString(); it.BadgeColor = Theme.Danger; } } }
                 else if (it.Id == Scanners.Cleanup) { long t = Store.Total(Scanners.Cleanup); if (t > (1L << 30)) { it.Badge = U.GB(t) + " GB"; it.BadgeColor = Theme.Primary; } }
+                else if (it.Id == "drivers" && Drivers.Scanned) { int n = Drivers.ProblemCount; if (n > 0) { it.Badge = n.ToString(); it.BadgeColor = Theme.Danger; } }
+                else if (it.Id == "apps" && Winget.Checked) { int n = 0; foreach (var a in AppsPage.Catalog) if (Winget.HasUpdate(a.Id)) n++; if (n > 0) { it.Badge = n.ToString(); it.BadgeColor = Theme.Primary; } }
                 else if (it.Id == "about" && Updater.Available != null) { it.Badge = L.T("جديد", "New"); it.BadgeColor = Theme.Primary; }
             }
             nav.Invalidate();
@@ -342,7 +350,7 @@ namespace WGuard
                 L.T("الفحص للقراءة فقط، ولا يُحذف أو يُعطَّل أي شيء قبل أن تختاره وتؤكّده.", "Scanning is read-only; nothing is deleted or disabled until you select and confirm it."),
                 L.T("الحذف إلى سلة المحذوفات افتراضياً، ويرفض البرنامج لمس ملفات ويندوز والمجلدات الحساسة.", "Deletes go to the Recycle Bin by default; Windows files and sensitive folders are refused."),
                 L.T("كل عملية تُسجَّل، ومدخلات السجل (Registry) تُنسخ احتياطياً قبل حذفها.", "Every action is logged; registry values are backed up before removal."),
-                L.T("الاتصال الوحيد بالإنترنت هو التحقق من التحديثات على GitHub، ولا يُرسل أي بيانات عن جهازك.", "The only network use is the GitHub update check; no data about your PC is sent."),
+                L.T("لا يُرسل أي بيانات عن جهازك. يتصل بالإنترنت فقط للتحقق من التحديثات، ولتثبيت البرامج التي تختارها بنفسك عبر winget وجلب أيقوناتها.", "No data about your PC is sent. It goes online only to check for updates, and to install the programs you pick through winget and fetch their icons."),
                 L.T("مفتوح المصدر بالكامل على GitHub - لا شيفرة مخفية.", "Fully open source on GitHub - no hidden code.") };
             foreach (string s in items)
             {
@@ -414,7 +422,7 @@ namespace WGuard
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Log.Write("fatal: " + e.ExceptionObject);
                 Settings.Load();
                 L.Ar = Settings.Lang == "ar";
-                Theme.Apply(Settings.DarkMode || Demo.ForceDark);
+                Theme.Apply((Settings.DarkMode || Demo.ForceDark) && !Demo.ForceLight);
                 Updater.CleanupOld();
                 Log.Write("===== W-Guard " + AppInfo.VersionText + " started (" + Settings.Lang + ")");
                 Application.Run(new MainForm());

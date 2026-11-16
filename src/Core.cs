@@ -181,7 +181,6 @@ namespace WGuard
         public static Color DangerBg = Hex("FDECEB");
         public static Color Ok = Hex("1F9D6B");
         public static Color OkBg = Hex("E7F6EF");
-
         // extra surfaces (tables, notes, inputs)
         public static Color HeaderBg = Hex("F7F8FB");
         public static Color GridLine = Hex("D5DBE5");

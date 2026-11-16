@@ -254,7 +254,20 @@ namespace WGuard
         int hover = -1;
         bool linkHover;
         public event Action<string> Navigate;
-        const int HeaderH = 92, ItemH = 42, Gap = 3, Pad = 12;
+        const int HeaderH = 92, Gap = 3, Pad = 12, FooterH = 100;
+
+        // items shrink a little on short windows so the list never runs into the footer
+        int ItemH
+        {
+            get
+            {
+                int gaps = 0;
+                foreach (var it in Items) if (it.GapBefore) gaps++;
+                int n = Math.Max(1, Items.Count);
+                int h = (Height - HeaderH - FooterH - gaps * 18) / n - Gap;
+                return Math.Max(30, Math.Min(42, h));
+            }
+        }
         static readonly Font BrandFont = new Font("Segoe UI Semibold", 14f);
         static readonly Font LinkFont = new Font("Segoe UI", 9f, FontStyle.Underline);
 
@@ -296,14 +309,14 @@ namespace WGuard
                 bool sel = i == Selected, hov = i == hover;
                 if (sel) Theme.FillRound(g, Theme.Navy2, r, 10);
                 else if (hov) Theme.FillRound(g, Color.FromArgb(22, 255, 255, 255), r, 10);
-                if (sel) Theme.FillRound(g, Theme.Teal, Theme.M(new Rectangle(r.X, r.Y + 11, 3, r.Height - 22), W), 1.5f);
+                if (sel) Theme.FillRound(g, Theme.Teal, Theme.M(new Rectangle(r.X, r.Y + r.Height / 4, 3, r.Height / 2), W), 1.5f);
                 Color fg = sel ? Color.White : Theme.NavText;
                 TextRenderer.DrawText(g, it.Glyph, Theme.Icon, Theme.M(new Rectangle(r.X + 14, r.Y, 24, r.Height), W), sel ? Theme.Teal : Theme.Faint, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
                 int bw = 0;
                 if (!string.IsNullOrEmpty(it.Badge))
                 {
                     bw = Math.Max(22, TextRenderer.MeasureText(it.Badge, Theme.Small).Width + 8);
-                    var br = Theme.M(new Rectangle(r.Right - 12 - bw, r.Y + 11, bw, 20), W);
+                    var br = Theme.M(new Rectangle(r.Right - 12 - bw, r.Y + (r.Height - 20) / 2, bw, 20), W);
                     Theme.FillRound(g, it.BadgeColor, br, 10);
                     TextRenderer.DrawText(g, it.Badge, Theme.Small, br, Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
                 }

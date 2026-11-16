@@ -16,6 +16,7 @@ namespace WGuard
         public static bool Shots;   // demo.flag = "shots": save lossless PNG screenshots of every page, then quit
 
         public static bool ForceDark;   // "on-dark" / "shots-dark": demo in the dark look
+        public static bool ForceLight;  // "on-light" / "shots-light": demo in the light look
 
         public static void Detect(string[] args)
         {
@@ -25,6 +26,7 @@ namespace WGuard
                 string flag = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "demo.flag");
                 string v = File.Exists(flag) ? File.ReadAllText(flag).Trim().ToLowerInvariant() : "";
                 if (v.EndsWith("-dark")) { ForceDark = true; v = v.Substring(0, v.Length - 5); }
+                if (v.EndsWith("-light")) { ForceLight = true; v = v.Substring(0, v.Length - 6); }
                 if (v == "on") On = true;
                 if (v == "shots") { On = true; Shots = true; }
             }
@@ -124,7 +126,7 @@ namespace WGuard
         {
             string dir = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "shots");
             Directory.CreateDirectory(dir);
-            string[] ids = { "overview", Scanners.Space, Scanners.Old, Scanners.Games, Scanners.Programs, Scanners.Security, Scanners.Background, Scanners.Cleanup, Scanners.Desktop, "about" };
+            string[] ids = { "overview", Scanners.Space, Scanners.Old, Scanners.Games, Scanners.Programs, Scanners.Security, Scanners.Background, Scanners.Cleanup, Scanners.Desktop, "apps", "drivers", "about" };
             foreach (string id in ids)
             {
                 main.Go(id);

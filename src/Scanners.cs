@@ -358,6 +358,8 @@ namespace WGuard
                 }
             }
             if (full || section == Games) steps.Add(new ScanStep(L.T("الألعاب", "Games"), 5, ctx => { Store.Reset(Games); Store.Add(Games, ScanGames(ctx)); }));
+            if (full) steps.Add(new ScanStep(L.T("التعريفات", "Drivers"), 3, ctx => { ctx.Current = L.T("قراءة تعريفات الأجهزة...", "Reading device drivers..."); Drivers.Scan(); ctx.StepProgress = 1; }));
+            if (full) steps.Add(new ScanStep(L.T("التعريفات", "Drivers"), 3, ctx => { ctx.Current = L.T("قراءة تعريفات الأجهزة...", "Reading device drivers..."); Drivers.Scan(); ctx.StepProgress = 1; }));
             if (full || section == Programs) steps.Add(new ScanStep(L.T("البرامج المثبتة", "Installed programs"), 5, ctx => { Store.Reset(Programs); Store.Add(Programs, ScanPrograms(ctx)); }));
             if (full || section == Security) steps.Add(new ScanStep(L.T("الأمان والتشغيل التلقائي", "Security & autostart"), 8, ctx => { Store.Reset(Security); Store.Add(Security, ScanSecurity(ctx)); }));
             if (full || section == Background) steps.Add(new ScanStep(L.T("الخلفية وبدء التشغيل", "Background & startup"), 3, ctx => { Store.Reset(Background); Store.Add(Background, ScanBackground(ctx)); }));

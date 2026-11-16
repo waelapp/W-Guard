@@ -47,7 +47,8 @@
 - **أنت صاحب القرار.** الفحص للقراءة فقط، وكل حذف أو تعطيل يظهر في نافذة تأكيد قبل التنفيذ.
 - **آمن افتراضياً.** الحذف إلى سلة المحذوفات، وملفات ويندوز محمية، وكل عملية تُسجَّل ويمكن التراجع عنها.
 - **يشرح لماذا.** كل عنصر معه سبب واضح: لماذا يُقترح حذفه أو تعطيله، وكم يوفّر.
-- **كل شيء في مكان واحد.** المساحة، الألعاب، البرامج، التشغيل التلقائي، الملفات المؤقتة، وترتيب سطح المكتب.
+- **كل شيء في مكان واحد.** المساحة، الألعاب، البرامج، التشغيل التلقائي، الملفات المؤقتة، التعريفات، وترتيب سطح المكتب.
+- **جاهز بعد الفرمتة.** ثبّت أهم برامجك وحدّثها دفعة واحدة من «البرامج المهمة».
 - **بدون إعلانات أو تتبّع.** لا يرسل أي بيانات عن جهازك.
 - **عربي و English.** واجهة كاملة باللغتين.
 - **مفتوح المصدر بالكامل** بترخيص GPL-3.0.
@@ -65,6 +66,8 @@
 | ألعاب Steam و Epic و Xbox بالحجم وآخر تشغيل | ✅ | ❌ | ❌ | ❌ |
 | ترتيب سطح المكتب مع زر تراجع | ✅ | ❌ | ❌ | ❌ |
 | تقييم صحة الجهاز من 100 | ✅ | ❌ | ❌ | ❌ |
+| تثبيت وتحديث أهم البرامج دفعة واحدة | ✅ | ❌ | ❌ | ❌ |
+| كشف التعريفات الناقصة والقديمة | ✅ | ❌ | ❌ | ❌ |
 
 ## الأقسام
 
@@ -97,6 +100,17 @@
 ### التنظيف
 - ملفات ويندوز المؤقتة، وكاش NVIDIA و AMD و DirectX، وكاش المتصفحات و Discord و Steam
 
+### البرامج المهمة
+- ثبّت المتصفحات، وDiscord وTelegram، وSteam وEpic وEA، وVLC وOBS، و7-Zip وغيرها بضغطة واحدة — مفيد جداً بعد الفرمتة
+- يكشف البرامج المثبتة ويعرض التحديثات المتاحة، مع زر «تحديث المتاح»
+- شريط تقدم لكل برنامج مع حجم التنزيل، وأزرار إيقاف مؤقت وتخطٍّ وإيقاف الكل
+- التثبيت عبر winget الرسمي من Microsoft، ومن المصدر الرسمي لكل برنامج
+
+### التعريفات
+- يكشف الأجهزة التي ينقصها تعريف أو فيها مشكلة
+- يعرض كل تعريفات الجهاز: الشاشة، الصوت، الشبكة، البلوتوث، الكاميرا، الشرائح والتخزين
+- ينبهك على التعريف العام من ويندوز والتعريف القديم، مع رابط التحديث الرسمي (NVIDIA و AMD و Intel أو Windows Update)
+
 ### ترتيب سطح المكتب
 - تصنيف ذكي في 8 مجلدات: الألعاب، البرامج، البرمجة، التصاميم، الوسائط، المستندات، المضغوطة، للمراجعة
 - تستعرض المجلدات وتسمّيها كما تحب قبل البدء، وزر تراجع يعيد كل شيء
@@ -107,12 +121,16 @@
 | الأمان وتقييم الخطورة | الخلفية وبدء التشغيل |
 | <img src="docs/img/games.png" width="420"> | <img src="docs/img/desktop-folders.png" width="300"> |
 | الألعاب | ترتيب سطح المكتب |
+| <img src="docs/img/apps.png" width="420"> | <img src="docs/img/drivers.png" width="420"> |
+| البرامج المهمة | التعريفات |
 
 ## الخصوصية
 
-- الاتصال الوحيد بالإنترنت: طلب واحد عند التشغيل إلى `api.github.com` لمعرفة رقم آخر إصدار، ويمكن إيقافه من الإعدادات.
 - لا يُرسل أي شيء عن جهازك، ولا توجد إعلانات أو إحصائيات استخدام.
-- البرنامج لا ينزّل ولا يشغّل أي ملف بنفسه: عند صدور إصدار جديد يظهر تنبيه، والتنزيل يتم من متصفحك.
+- الاتصال بالإنترنت يكون فقط في هذه الحالات:
+  - طلب عند التشغيل إلى `api.github.com` لمعرفة رقم آخر إصدار، ويمكن إيقافه من الإعدادات.
+  - في «البرامج المهمة»: جلب أيقونات البرامج، وتثبيت أو تحديث البرامج التي تختارها بنفسك فقط، عبر winget من Microsoft.
+- تحديثات W-Guard نفسه لا تُنزَّل تلقائياً: يظهر تنبيه، والتنزيل يتم من متصفحك.
 
 ## التنزيل
 
@@ -158,7 +176,9 @@
 - Read-only scanning; every delete or disable is listed in a confirmation window first.
 - Deletes go to the Recycle Bin by default; Windows files are protected; every action is logged and can be undone.
 - Disk space, games (Steam / Epic / Xbox), programs, autostart risk rating, background & startup advice, cleanup, desktop organizer.
-- No ads, no telemetry. The only network access is a version check against `api.github.com`, which can be turned off.
+- **Essential apps:** install or update browsers, Discord, Steam, VLC, 7-Zip and more in one go via winget — great after a fresh Windows install.
+- **Drivers:** finds devices with missing or problem drivers, and flags generic or outdated ones.
+- No ads, no telemetry. Network access: a version check against `api.github.com` (can be turned off), plus app icons and the installs you choose on the Essential apps page.
 - Arabic and English interface.
 
 **Download:** [Releases](https://github.com/waelapp/W-Guard/releases/latest) · **Feedback:** [Issues](https://github.com/waelapp/W-Guard/issues/new/choose) · **License:** GPL-3.0 (the W-Guard name and logo are not covered — see [TRADEMARK.md](TRADEMARK.md))
