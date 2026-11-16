@@ -402,6 +402,14 @@ namespace WGuard
     // ------------------------------------------------------------------ entry point
     static class Program
     {
+        static Mutex single;
+
+        // lets the in-app update's setup run while this copy is closing (the setup waits until no copy holds the name)
+        public static void ReleaseSingleInstance()
+        {
+            try { if (single != null) { single.ReleaseMutex(); single.Close(); } } catch { }
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -409,6 +417,7 @@ namespace WGuard
             Demo.Detect(args);
             using (var mtx = new Mutex(true, Demo.Shots ? "W-Guard.WAEL.DemoShots" : "W-Guard.WAEL.SingleInstance", out created))
             {
+                single = mtx;
                 if (!created)
                 {
                     bool restart = args.Length > 0 && args[0] == "--restart";

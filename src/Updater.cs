@@ -1,7 +1,7 @@
 ﻿// W-Guard - Update checker (GitHub Releases). The only network access in the program.
 // It reads https://api.github.com/repos/<owner>/<repo>/releases/latest (version + notes only).
-// When a newer version exists, the user downloads it in the browser and runs it - W-Guard never
-// downloads or starts the update itself.
+// When a newer version exists and the user presses "Update now", W-Guard downloads the official release
+// file, checks it against the release's SHA-256 file, then runs it. Nothing is downloaded without that press.
 // © 2026 WAEL - https://github.com/waelapp
 // W-Guard is free software, licensed under the GNU GPL v3.0 - see LICENSE. The name "W-Guard" and its logo belong to WAEL.
 using System;
@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
@@ -140,9 +141,7 @@ namespace WGuard
             get { return File.Exists(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "unins000.exe")); }
         }
 
-        // The update is never downloaded or run by W-Guard itself: the browser downloads it from the
-        // official release and the user runs it (two steps). This keeps the program free of any
-        // "download and execute" behaviour.
+        // fallback when the in-app update cannot finish: the browser downloads it from the official release
         public static string DownloadUrl(ReleaseInfo r, bool installed)
         {
             if (installed && !string.IsNullOrEmpty(r.SetupUrl)) return r.SetupUrl;
@@ -151,10 +150,96 @@ namespace WGuard
             return "https://github.com/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName + "/releases/latest";
         }
 
+        // ---- in-app update (only after the user presses "Update now")
+        // Downloads the release file for this copy (setup for installed, W-Guard.exe for portable) from the official
+        // GitHub release, and refuses it unless its SHA-256 matches the release's .sha256 file. Returns the file path.
+        public static string Download(ReleaseInfo r, bool installed, Action<long, long> progress, Func<bool> cancelled)
+        {
+            string url = installed ? r.SetupUrl : r.ExeUrl, shaUrl = installed ? r.SetupShaUrl : r.ShaUrl;
+            string official = "https://github.com/" + AppInfo.RepoOwner + "/" + AppInfo.RepoName + "/releases/download/";
+            if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(shaUrl) || !url.StartsWith(official, StringComparison.OrdinalIgnoreCase) || !shaUrl.StartsWith(official, StringComparison.OrdinalIgnoreCase))
+                throw new Exception(L.T("لم يُعثر على ملف التحديث في صفحة الإصدار.", "The update file was not found on the release page."));
+
+            string shaText;
+            using (var resp = Req(shaUrl).GetResponse())
+            using (var sr = new StreamReader(resp.GetResponseStream(), Encoding.ASCII)) shaText = sr.ReadToEnd();
+            Match hm = Regex.Match(shaText, "[0-9a-fA-F]{64}");
+            if (!hm.Success) throw new Exception(L.T("ملف البصمة غير صالح.", "The checksum file is not valid."));
+            string expected = hm.Value.ToLowerInvariant();
+
+            string dest;
+            if (installed)
+            {
+                string dir = Path.Combine(Path.GetTempPath(), "W-Guard-update");
+                Directory.CreateDirectory(dir);
+                dest = Path.Combine(dir, "W-Guard-Setup-" + r.Version.ToString(3) + ".exe");
+            }
+            else dest = Application.ExecutablePath + ".download";
+
+            var req = Req(url);
+            req.Timeout = 30000;
+            string actual;
+            try
+            {
+                using (var resp = req.GetResponse())
+                using (var input = resp.GetResponseStream())
+                using (var output = new FileStream(dest, FileMode.Create, FileAccess.Write))
+                using (var sha = SHA256.Create())
+                {
+                    long total = resp.ContentLength > 0 ? resp.ContentLength : (installed ? r.SetupSize : r.ExeSize), done = 0;
+                    var buf = new byte[65536];
+                    int n;
+                    while ((n = input.Read(buf, 0, buf.Length)) > 0)
+                    {
+                        if (cancelled != null && cancelled()) throw new OperationCanceledException();
+                        output.Write(buf, 0, n);
+                        sha.TransformBlock(buf, 0, n, null, 0);
+                        done += n;
+                        if (progress != null) progress(done, total);
+                    }
+                    sha.TransformFinalBlock(new byte[0], 0, 0);
+                    actual = BitConverter.ToString(sha.Hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+            catch { try { File.Delete(dest); } catch { } throw; }
+
+            if (actual != expected)
+            {
+                try { File.Delete(dest); } catch { }
+                Log.Write("update: checksum mismatch for " + url);
+                throw new Exception(L.T("بصمة الملف المنزّل لا تطابق الإصدار الرسمي، فلم يُشغَّل.", "The downloaded file does not match the official checksum, so it was not run."));
+            }
+            Log.Write("update downloaded and verified: " + r.Tag);
+            return dest;
+        }
+
+        // Runs the verified update. Installed: the setup runs silently, closes W-Guard and starts the new version.
+        // Portable: the new file takes the place of W-Guard.exe and starts after this copy closes.
+        // The caller must exit the program right after this returns.
+        public static void Apply(string file, bool installed)
+        {
+            if (installed)
+            {
+                Program.ReleaseSingleInstance();   // the setup waits for W-Guard to close (AppMutex)
+                Process.Start(new ProcessStartInfo(file, "/SILENT /NORESTART") { UseShellExecute = true });
+            }
+            else
+            {
+                string exe = Application.ExecutablePath, old = exe + ".old";
+                if (File.Exists(old)) File.Delete(old);
+                File.Move(exe, old);
+                try { File.Move(file, exe); }
+                catch { File.Move(old, exe); throw; }
+                Process.Start(new ProcessStartInfo(exe, "--restart") { UseShellExecute = false, WorkingDirectory = Path.GetDirectoryName(exe) });
+            }
+            Log.Write("update started: " + (installed ? "setup" : "portable"));
+        }
+
         public static void CleanupOld()
         {
             try { string old = Application.ExecutablePath + ".old"; if (File.Exists(old)) File.Delete(old); } catch { }
             try { string tmp = Application.ExecutablePath + ".download"; if (File.Exists(tmp)) File.Delete(tmp); } catch { }
+            try { string dir = Path.Combine(Path.GetTempPath(), "W-Guard-update"); if (Directory.Exists(dir)) Directory.Delete(dir, true); } catch { }
         }
     }
 }

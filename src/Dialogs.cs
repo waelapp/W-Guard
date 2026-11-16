@@ -199,13 +199,19 @@ namespace WGuard
         }
     }
 
-    // ------------------------------------------------------------------ update window (two steps: download from GitHub, then run it)
+    // ------------------------------------------------------------------ update window: "Update now" downloads the official file, verifies it, then runs it
     class UpdateForm : Form
     {
         protected override void OnLoad(EventArgs e) { Theme.Style(this); base.OnLoad(e); }
 
         readonly ReleaseInfo rel;
         readonly bool installed;
+        readonly FlatButton go, later;
+        readonly LinkLabel skip, browser;
+        volatile bool busy, cancel;
+        long done, total;
+        string status = "", error = "";
+        readonly System.Windows.Forms.Timer tick = new System.Windows.Forms.Timer { Interval = 150 };
 
         public UpdateForm(ReleaseInfo r)
         {
@@ -229,22 +235,88 @@ namespace WGuard
                 Bounds = new Rectangle(42, 118, 516, 120)
             };
             Controls.Add(notes);
+            Shown += (s, e) => { notes.SelectionStart = 0; notes.SelectionLength = 0; go.Focus(); };
 
-            var go = new FlatButton(L.T("تنزيل التحديث", "Download update"), FlatButton.Kind.Primary, Glyph.Download);
-            var later = new FlatButton(L.T("لاحقاً", "Later"), FlatButton.Kind.Secondary, "");
-            var skip = new LinkLabel { Text = L.T("تخطّي هذا الإصدار", "Skip this version"), AutoSize = true, LinkColor = Theme.Muted, LinkBehavior = LinkBehavior.HoverUnderline };
-            go.Location = Theme.M(new Rectangle(32, 456, go.Width, 38), 600).Location;
-            later.Location = Theme.M(new Rectangle(32 + go.Width + 10, 456, later.Width, 38), 600).Location;
-            skip.Location = Theme.M(new Rectangle(600 - 32 - 140, 466, 140, 20), 600).Location;
-            go.Click += (s, e) =>
+            go = new FlatButton(L.T("تحديث الآن", "Update now"), FlatButton.Kind.Primary, Glyph.Download);
+            later = new FlatButton(L.T("لاحقاً", "Later"), FlatButton.Kind.Secondary, "");
+            skip = new LinkLabel { Text = L.T("تخطّي هذا الإصدار", "Skip this version"), AutoSize = true, LinkColor = Theme.Muted, LinkBehavior = LinkBehavior.HoverUnderline };
+            browser = new LinkLabel { Text = L.T("التنزيل من المتصفح", "Download in the browser"), AutoSize = true, LinkColor = Theme.Link, LinkBehavior = LinkBehavior.HoverUnderline, Visible = false };
+            go.Click += (s, e) => Start();
+            later.Click += (s, e) => { if (busy) cancel = true; else Close(); };
+            skip.LinkClicked += (s, e) => { Settings.SkipVersion = rel.Tag; Settings.Save(); Close(); };
+            browser.LinkClicked += (s, e) =>
             {
                 U.Open(Updater.DownloadUrl(rel, installed));
                 Log.Write("update download opened in browser: " + rel.Tag);
                 Close();
             };
-            later.Click += (s, e) => Close();
-            skip.LinkClicked += (s, e) => { Settings.SkipVersion = rel.Tag; Settings.Save(); Close(); };
-            Controls.Add(go); Controls.Add(later); Controls.Add(skip);
+            Controls.Add(go); Controls.Add(later); Controls.Add(skip); Controls.Add(browser);
+            Place();
+            tick.Tick += (s, e) => Invalidate(new Rectangle(0, 370, ClientSize.Width, 76));
+            FormClosing += (s, e) => { if (busy) { cancel = true; e.Cancel = true; } };
+            FormClosed += (s, e) => tick.Dispose();
+        }
+
+        void Place()
+        {
+            go.Location = Theme.M(new Rectangle(32, 456, go.Width, 38), 600).Location;
+            later.Location = Theme.M(new Rectangle(32 + go.Width + 10, 456, later.Width, 38), 600).Location;
+            skip.Location = Theme.M(new Rectangle(600 - 32 - 140, 466, 140, 20), 600).Location;
+            browser.Location = Theme.M(new Rectangle(600 - 32 - 170, 466, 170, 20), 600).Location;
+        }
+
+        void Start()
+        {
+            if (busy) return;
+            busy = true; cancel = false; error = ""; done = 0; total = 0;
+            status = L.T("جارٍ التنزيل من صفحة البرنامج الرسمية…", "Downloading from the official page…");
+            go.Enabled = false; skip.Visible = false; browser.Visible = false;
+            later.Text = L.T("إلغاء", "Cancel"); Place();
+            tick.Start();
+            var th = new System.Threading.Thread(() =>
+            {
+                string file = null, err = null;
+                try { file = Updater.Download(rel, installed, (d, t) => { done = d; total = t; }, () => cancel); }
+                catch (OperationCanceledException) { err = ""; }
+                catch (Exception ex) { err = ex.Message; Log.Write("update download failed: " + ex.Message); }
+                try { BeginInvoke((Action)(() => Finish(file, err))); } catch { }
+            });
+            th.IsBackground = true;
+            th.Start();
+        }
+
+        void Finish(string file, string err)
+        {
+            tick.Stop();
+            busy = false;
+            if (err != null)
+            {
+                error = err.Length == 0 ? L.T("أُلغي التحديث.", "Update cancelled.") : err;
+                status = "";
+                go.Text = L.T("إعادة المحاولة", "Try again"); go.Enabled = true;
+                later.Text = L.T("لاحقاً", "Later");
+                browser.Visible = err.Length > 0; skip.Visible = !browser.Visible;
+                Place(); Invalidate();
+                return;
+            }
+            status = installed ? L.T("تم التحقق من الملف. جارٍ التثبيت، وسيفتح W-Guard من جديد…", "File verified. Installing - W-Guard will open again…")
+                               : L.T("تم التحقق من الملف. جارٍ إعادة التشغيل بالإصدار الجديد…", "File verified. Restarting with the new version…");
+            done = total = 1;
+            later.Enabled = false;
+            Invalidate(); Update();
+            try
+            {
+                Updater.Apply(file, installed);
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                Log.Write("update apply failed: " + ex.Message);
+                error = ex.Message; status = "";
+                go.Text = L.T("إعادة المحاولة", "Try again"); go.Enabled = true; later.Enabled = true;
+                browser.Visible = true; skip.Visible = false;
+                Place(); Invalidate();
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -260,21 +332,44 @@ namespace WGuard
             Theme.Txt(g, L.T("ما الجديد", "What's new"), Theme.Bold, Theme.Text, M(new Rectangle(32, 88, W - 64, 22)), Theme.Align.Start);
             Theme.FillRound(g, Theme.Bg, M(new Rectangle(32, 112, W - 64, 132)), 12);
 
-            // the two steps
-            Theme.Txt(g, L.T("التحديث في خطوتين", "Update in two steps"), Theme.Bold, Theme.Text, M(new Rectangle(32, 258, W - 64, 22)), Theme.Align.Start);
-            string s1 = L.T("اضغط «تنزيل التحديث» - يُنزَّل الملف من صفحة البرنامج الرسمية على GitHub في متصفحك.", "Press “Download update” - your browser downloads it from the official GitHub page.");
+            Theme.Txt(g, L.T("كيف يتم التحديث", "How the update works"), Theme.Bold, Theme.Text, M(new Rectangle(32, 258, W - 64, 22)), Theme.Align.Start);
+            string s1 = L.T("يُنزَّل الملف من صفحة البرنامج الرسمية على GitHub، ويُتحقق من بصمته قبل تشغيله.", "The file is downloaded from the official GitHub page and its checksum is verified before it runs.");
             string s2 = installed
-                ? L.T("شغّل الملف المنزّل W-Guard-Setup.exe - يغلق W-Guard ويثبّت الإصدار الجديد مكانه مع الإبقاء على إعداداتك.", "Run the downloaded W-Guard-Setup.exe - it closes W-Guard and installs the new version, keeping your settings.")
-                : L.T("أغلق W-Guard وضع الملف الجديد W-Guard.exe مكان القديم، ثم شغّله.", "Close W-Guard, put the new W-Guard.exe in place of the old one, then run it.");
+                ? L.T("يُغلق W-Guard ويُثبَّت الإصدار الجديد مع إبقاء إعداداتك، ثم يفتح من جديد.", "W-Guard closes, the new version installs with your settings kept, then it opens again.")
+                : L.T("يستبدل W-Guard ملفه بالإصدار الجديد ويفتح من جديد.", "W-Guard replaces its file with the new version and opens again.");
             Step(g, 1, s1, 286, W);
             Step(g, 2, s2, 330, W);
 
-            var note = new Rectangle(32, 384, W - 64, 52);
-            Theme.FillRound(g, Theme.OkBg, M(note), 10);
-            TextRenderer.DrawText(g, Glyph.Shield, Theme.Icon, M(new Rectangle(note.X + 10, note.Y, 26, note.Height)), Theme.Ok, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
-            Theme.Txt(g, L.T("نزّل التحديثات من صفحة البرنامج الرسمية فقط. البرنامج لا يرسل أي بيانات عن جهازك، ويمكنك إيقاف التحقق من التحديثات من الإعدادات.",
-                "Only download updates from the official page. W-Guard sends no data about your PC, and you can turn off update checks in Settings."),
-                Theme.Small, Theme.NoteText, M(new Rectangle(note.X + 40, note.Y + 4, note.Width - 52, note.Height - 8)), Theme.Align.Start, true, true);
+            var box = new Rectangle(32, 384, W - 64, 52);
+            if (busy || status.Length > 0)
+            {
+                Theme.FillRound(g, Theme.Bg, M(box), 10);
+                string size = total > 1 ? "   " + U.Size(done) + " / " + U.Size(total) : done > 1 ? "   " + U.Size(done) : "";
+                int pct = total > 1 ? (int)Math.Min(100, done * 100 / total) : 0;
+                Theme.Txt(g, status + (total > 1 && busy ? "   " + pct + "%" : ""), Theme.Small, Theme.Text, M(new Rectangle(box.X + 14, box.Y + 6, box.Width - 28, 20)), Theme.Align.Start);
+                if (size.Length > 0 && busy) Theme.Txt(g, size.Trim(), Theme.Small, Theme.Muted, M(new Rectangle(box.X + 14, box.Y + 6, box.Width - 28, 20)), Theme.Align.End);
+                var track = new Rectangle(box.X + 14, box.Y + 32, box.Width - 28, 8);
+                Theme.FillRound(g, Theme.Track, M(track), 4);
+                double f = total > 0 ? Math.Min(1.0, (double)done / total) : 0;
+                if (f > 0)
+                {
+                    var fill = new Rectangle(track.X, track.Y, Math.Max(8, (int)(track.Width * f)), track.Height);
+                    Theme.FillRound(g, Theme.Primary, M(fill), 4);
+                }
+            }
+            else if (error.Length > 0)
+            {
+                Theme.FillRound(g, Theme.DangerBg, M(box), 10);
+                Theme.Txt(g, error, Theme.Small, Theme.Danger, M(new Rectangle(box.X + 14, box.Y + 4, box.Width - 28, box.Height - 8)), Theme.Align.Start, true, true);
+            }
+            else
+            {
+                Theme.FillRound(g, Theme.OkBg, M(box), 10);
+                TextRenderer.DrawText(g, Glyph.Shield, Theme.Icon, M(new Rectangle(box.X + 10, box.Y, 26, box.Height)), Theme.Ok, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                Theme.Txt(g, L.T("التحديث من صفحة البرنامج الرسمية فقط، ولا يُشغَّل إلا إذا طابقت بصمته. البرنامج لا يرسل أي بيانات عن جهازك.",
+                    "Updates come only from the official page and run only if the checksum matches. W-Guard sends no data about your PC."),
+                    Theme.Small, Theme.NoteText, M(new Rectangle(box.X + 40, box.Y + 4, box.Width - 52, box.Height - 8)), Theme.Align.Start, true, true);
+            }
         }
 
         static void Step(Graphics g, int n, string text, int y, int W)

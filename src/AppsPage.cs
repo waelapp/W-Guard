@@ -39,7 +39,7 @@ namespace WGuard
         static readonly object gate = new object();
 
         // installed / update results that only mean "nothing to do"
-        const int AlreadyInstalled = unchecked((int)0x8A150061), NoUpdate = unchecked((int)0x8A15002B), RestartNeeded = unchecked((int)0x8A150109), RebootInit = unchecked((int)0x8A15010A), NotFound = unchecked((int)0x8A150014);
+        const int InstallerFailed = unchecked((int)0x8A150006), AlreadyInstalled = unchecked((int)0x8A150061), NoUpdate = unchecked((int)0x8A15002B), RestartNeeded = unchecked((int)0x8A150109), RebootInit = unchecked((int)0x8A15010A), NotFound = unchecked((int)0x8A150014);
 
         public static string Exe
         {
@@ -323,7 +323,13 @@ namespace WGuard
         }
 
         public static bool IsInstalled(string id) { lock (Installed) return Installed.Contains(id); }
-        public static bool HasUpdate(string id) { lock (Installed) return Upgradable.Contains(id); }
+        // launchers that keep themselves up to date when opened. Updating them through winget removes the old
+        // version first, and if their own installer then fails the launcher is gone - so W-Guard leaves them alone.
+        public static readonly HashSet<string> SelfUpdating = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Valve.Steam", "EpicGames.EpicGamesLauncher", "ElectronicArts.EADesktop", "Ubisoft.Connect", "Blizzard.BattleNet", "Discord.Discord", "Microsoft.Edge"
+        };
+        public static bool HasUpdate(string id) { if (SelfUpdating.Contains(id)) return false; lock (Installed) return Upgradable.Contains(id); }
 
         // installs (or updates, when it is already there) one program silently. Returns true on success.
         public static bool Apply(AppDef a, out string message, Action<double> progress)
@@ -345,7 +351,15 @@ namespace WGuard
                 message = code == RestartNeeded || code == RebootInit ? L.T("تم - يحتاج إعادة تشغيل الجهاز", "Done - restart needed") : upgrade ? L.T("تم التحديث", "Updated") : L.T("تم التثبيت", "Installed");
                 return true;
             }
-            message = code == -2 ? L.T("انتهت المهلة", "Timed out") : L.T("لم ينجح", "Failed") + " (0x" + code.ToString("X8") + ")";
+            if (code == -2) message = L.T("انتهت المهلة", "Timed out");
+            else if (code == InstallerFailed && o.IndexOf("Successfully uninstalled", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                // winget removed the old version, then the program's own installer failed
+                lock (Installed) { Installed.Remove(a.Id); Upgradable.Remove(a.Id); }
+                message = L.T("أُزيلت النسخة القديمة وفشل مثبّت الجديدة - أعد تشغيل الجهاز ثم ثبّته", "Old version removed but its installer failed - restart, then install it");
+            }
+            else if (code == InstallerFailed) message = L.T("فشل مثبّت البرنامج نفسه - أعد تشغيل الجهاز ثم جرّب", "The app's own installer failed - restart, then try again");
+            else message = L.T("لم ينجح", "Failed") + " (0x" + code.ToString("X8") + ")";
             return false;
         }
 
